@@ -222,44 +222,70 @@
 
     </header>
 
-    <!-- MIDDLE: PHASER TOP-DOWN 2D BATTLEFIELD (Close-up Zoomed In) -->
-    <div id="phaser-container" class="flex-1 w-full bg-[#FAF8F5] relative flex items-center justify-center overflow-hidden">
-      <!-- Live Battle Feed Ticker -->
-      <div id="battle-ticker" class="battle-ticker"></div>
-      <!-- Phaser Canvas renders here -->
-    </div>
+    <!-- BATTLE MAIN CONTAINER: 2-COLUMN SPLIT (Left: Map Overview, Right: Big Question & Answers) -->
+    <main class="flex-1 min-h-0 flex flex-col lg:flex-row p-3 gap-3 overflow-hidden bg-[#FAF8F5]">
+      
+      <!-- LEFT: TOÀN CẢNH MAP (FULL BATTLEFIELD ARENA) -->
+      <section class="flex-1 lg:flex-[58] xl:flex-[60] h-full relative rounded-2xl border-[2.5px] border-[#18181B] shadow-[4px_5px_0px_#18181B] overflow-hidden bg-[#101827]">
+        <div id="phaser-container" class="w-full h-full relative flex items-center justify-center">
+          <!-- Live Battle Feed Ticker -->
+          <div id="battle-ticker" class="battle-ticker"></div>
+          <!-- Phaser Canvas renders here -->
+        </div>
+      </section>
 
-    <!-- BOTTOM: QUESTION & 4 ANSWERS DISPLAY (Neo-Brutalist Option Cards) -->
-    <footer class="bg-white border-t-[2.5px] border-[#18181B] p-4 z-20 shadow-[0_-4px_0px_#18181B]">
-      <div class="max-w-5xl mx-auto">
-        <!-- Question Text -->
-        <div class="text-center mb-3">
-          <h3 id="battle-question-text" class="text-lg md:text-xl font-extrabold text-[#18181B]">
-            Đang chuẩn bị câu hỏi tiếp theo...
-          </h3>
+      <!-- RIGHT: CÂU HỎI VÀ ĐÁP ÁN BỰ HƠN 1 BÊN -->
+      <aside class="flex-1 lg:flex-[42] xl:flex-[40] h-full flex flex-col justify-between p-4 md:p-5 taste-card bg-white overflow-y-auto">
+        
+        <!-- Header badge & Big Question -->
+        <div class="mb-2">
+          <div class="flex items-center justify-between mb-2.5">
+            <span class="badge-pill-green text-xs font-black">
+              ● CÂU HỎI CHIẾN ĐẤU
+            </span>
+            <span class="text-xs font-mono font-black px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#B45309] border border-[#18181B] shadow-[1px_1px_0px_#18181B]">
+              THỜI GIAN THỰC
+            </span>
+          </div>
+
+          <div class="p-4 md:p-5 rounded-2xl bg-[#FAF8F5] border-[2.5px] border-[#18181B] shadow-[3px_4px_0px_#18181B]">
+            <div class="text-[10px] font-black uppercase text-[#52525B] tracking-wider mb-1.5 flex items-center gap-1.5">
+              <span>🎯</span> NỘI DUNG CÂU HỎI:
+            </div>
+            <h3 id="battle-question-text" class="text-lg md:text-xl xl:text-2xl font-black text-[#18181B] leading-snug">
+              Đang chuẩn bị câu hỏi tiếp theo...
+            </h3>
+          </div>
         </div>
 
-        <!-- 4 Option Cards -->
-        <div id="battle-options-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div id="b-opt-0" class="quiz-option opt-a py-2.5 px-3 rounded-xl text-sm font-bold flex items-center gap-2">
-            <span class="w-6 h-6 rounded-lg bg-white/70 border border-[#18181B] flex items-center justify-center font-black text-xs">▲</span>
-            <span id="b-opt-text-0" class="truncate">Đáp án A</span>
+        <!-- 4 Large Answer Options (Stacked Vertically, Large Cards) -->
+        <div id="battle-options-grid" class="flex-1 flex flex-col justify-center gap-2.5 my-1">
+          <div id="b-opt-0" class="quiz-option opt-a p-3.5 md:p-4 rounded-xl text-base md:text-lg font-black flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-white/80 border-2 border-[#18181B] flex items-center justify-center font-black text-sm shrink-0 shadow-[1px_1px_0px_#18181B]">▲</span>
+            <span id="b-opt-text-0" class="flex-1 break-words leading-tight">Đáp án A</span>
           </div>
-          <div id="b-opt-1" class="quiz-option opt-b py-2.5 px-3 rounded-xl text-sm font-bold flex items-center gap-2">
-            <span class="w-6 h-6 rounded-lg bg-white/70 border border-[#18181B] flex items-center justify-center font-black text-xs">◆</span>
-            <span id="b-opt-text-1" class="truncate">Đáp án B</span>
+          <div id="b-opt-1" class="quiz-option opt-b p-3.5 md:p-4 rounded-xl text-base md:text-lg font-black flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-white/80 border-2 border-[#18181B] flex items-center justify-center font-black text-sm shrink-0 shadow-[1px_1px_0px_#18181B]">◆</span>
+            <span id="b-opt-text-1" class="flex-1 break-words leading-tight">Đáp án B</span>
           </div>
-          <div id="b-opt-2" class="quiz-option opt-c py-2.5 px-3 rounded-xl text-sm font-bold flex items-center gap-2">
-            <span class="w-6 h-6 rounded-lg bg-white/70 border border-[#18181B] flex items-center justify-center font-black text-xs">●</span>
-            <span id="b-opt-text-2" class="truncate">Đáp án C</span>
+          <div id="b-opt-2" class="quiz-option opt-c p-3.5 md:p-4 rounded-xl text-base md:text-lg font-black flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-white/80 border-2 border-[#18181B] flex items-center justify-center font-black text-sm shrink-0 shadow-[1px_1px_0px_#18181B]">●</span>
+            <span id="b-opt-text-2" class="flex-1 break-words leading-tight">Đáp án C</span>
           </div>
-          <div id="b-opt-3" class="quiz-option opt-d py-2.5 px-3 rounded-xl text-sm font-bold flex items-center gap-2">
-            <span class="w-6 h-6 rounded-lg bg-white/70 border border-[#18181B] flex items-center justify-center font-black text-xs">■</span>
-            <span id="b-opt-text-3" class="truncate">Đáp án D</span>
+          <div id="b-opt-3" class="quiz-option opt-d p-3.5 md:p-4 rounded-xl text-base md:text-lg font-black flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-white/80 border-2 border-[#18181B] flex items-center justify-center font-black text-sm shrink-0 shadow-[1px_1px_0px_#18181B]">■</span>
+            <span id="b-opt-text-3" class="flex-1 break-words leading-tight">Đáp án D</span>
           </div>
         </div>
-      </div>
-    </footer>
+
+        <!-- Tactical helper footer -->
+        <div class="mt-2 text-center text-[11px] font-bold text-[#52525B] bg-[#FAF8F5] py-1.5 px-3 rounded-lg border border-[#18181B]">
+          ⚡ Trả lời đúng và nhanh nhất trên điện thoại để kích hoạt hỏa tiễn RPG!
+        </div>
+
+      </aside>
+
+    </main>
 
   </div>
 

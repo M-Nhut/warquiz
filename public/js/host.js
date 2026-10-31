@@ -366,6 +366,15 @@ function showBattle() {
   hostBattle.classList.remove('hidden');
   hostVictory.classList.add('hidden');
   updateHpBars(maxBaseHp, maxBaseHp);
+
+  setTimeout(() => {
+    if (phaserGame && phaserGame.scale) {
+      phaserGame.scale.refresh();
+    }
+    if (battleScene && battleScene.isReady) {
+      battleScene.handleResize(battleScene.scale.width, battleScene.scale.height);
+    }
+  }, 120);
 }
 
 function showVictory(data) {
@@ -479,30 +488,32 @@ class TacticalArenaScene extends Phaser.Scene {
 
   getUnitScale() {
     const factor = this.mapDisplayW / 1024;
-    return Math.max(2.4, Math.min(4.5, 2.7 * Math.max(0.9, factor)));
+    return Math.max(1.6, Math.min(2.7, 1.95 * Math.max(0.75, factor)));
   }
 
-  applyCombatCamera(animate = true) {
-    // Focus in close-up on central castle corridor and front battle line
-    const targetX = this.mapX(470);
-    const targetY = this.mapY(380);
-    const combatZoom = 1.48;
+  applyCombatCamera(animate = false) {
+    // Full panoramic overview camera - shows the entire map from left base to right base
+    const w = this.scale.width;
+    const h = this.scale.height;
+    const targetX = w / 2;
+    const targetY = h / 2;
+    const overviewZoom = 1.0;
 
     if (animate) {
-      this.cameras.main.pan(targetX, targetY, 700, 'Power2');
-      this.cameras.main.zoomTo(combatZoom, 700, 'Power2');
+      this.cameras.main.pan(targetX, targetY, 400, 'Power2');
+      this.cameras.main.zoomTo(overviewZoom, 400, 'Power2');
     } else {
       this.cameras.main.centerOn(targetX, targetY);
-      this.cameras.main.setZoom(combatZoom);
+      this.cameras.main.setZoom(overviewZoom);
     }
   }
 
-  applyFullOverviewCamera(animate = true) {
+  applyFullOverviewCamera(animate = false) {
     const w = this.scale.width;
     const h = this.scale.height;
     if (animate) {
-      this.cameras.main.pan(w / 2, h / 2, 800, 'Power2');
-      this.cameras.main.zoomTo(1.0, 800, 'Power2');
+      this.cameras.main.pan(w / 2, h / 2, 400, 'Power2');
+      this.cameras.main.zoomTo(1.0, 400, 'Power2');
     } else {
       this.cameras.main.centerOn(w / 2, h / 2);
       this.cameras.main.setZoom(1.0);
@@ -591,11 +602,11 @@ class TacticalArenaScene extends Phaser.Scene {
 
     let bgW, bgH;
     if (screenAspect > mapAspect) {
-      bgW = width;
-      bgH = width / mapAspect;
-    } else {
       bgH = height;
       bgW = height * mapAspect;
+    } else {
+      bgW = width;
+      bgH = width / mapAspect;
     }
 
     this.mapDisplayW = bgW;
@@ -610,7 +621,7 @@ class TacticalArenaScene extends Phaser.Scene {
 
     const objX = this.mapX(470);
     const objY = this.mapY(405);
-    const beaconScale = Math.max(1.2, 1.5 * (bgH / 682));
+    const beaconScale = Math.max(0.9, 1.2 * (bgH / 682));
 
     if (this.objectivePulse) {
       this.objectivePulse.setPosition(objX, objY);
@@ -618,11 +629,11 @@ class TacticalArenaScene extends Phaser.Scene {
     }
     if (this.objectiveFlag) {
       this.objectiveFlag.setPosition(objX, this.mapY(360));
-      this.objectiveFlag.setScale(beaconScale * 0.9);
+      this.objectiveFlag.setScale(beaconScale * 0.85);
     }
     if (this.objectiveText) {
       this.objectiveText.setPosition(objX, this.mapY(305));
-      this.objectiveText.setFontSize(`${Math.round(Math.max(12, 14 * (bgW / 1024)))}px`);
+      this.objectiveText.setFontSize(`${Math.round(Math.max(10, 12 * (bgW / 1024)))}px`);
     }
 
     // Reposition all active unit sprites
@@ -633,7 +644,7 @@ class TacticalArenaScene extends Phaser.Scene {
         const ny = this.mapY(u.refY);
         u.sprite.setPosition(nx, ny);
         u.sprite.setScale(uScale);
-        u.label.setPosition(nx, ny - (25 * (uScale / 2.3)));
+        u.label.setPosition(nx, ny - (20 * (uScale / 1.8)));
       }
     });
 
@@ -777,12 +788,13 @@ class TacticalArenaScene extends Phaser.Scene {
     const screenAspect = w / h;
 
     let bgW, bgH;
+    // Contain mode: entire map is 100% visible from left base to right base
     if (screenAspect > mapAspect) {
-      bgW = w;
-      bgH = w / mapAspect;
-    } else {
       bgH = h;
       bgW = h * mapAspect;
+    } else {
+      bgW = w;
+      bgH = w / mapAspect;
     }
 
     this.mapDisplayW = bgW;
@@ -790,14 +802,14 @@ class TacticalArenaScene extends Phaser.Scene {
     this.mapOriginX = (w - bgW) / 2;
     this.mapOriginY = (h - bgH) / 2;
 
-    // 1. Kingdom Arena Fullscreen Background
+    // 1. Kingdom Arena Panoramic Background
     this.mapBg = this.add.image(w / 2, h / 2, 'map_kingdom');
     this.mapBg.setDisplaySize(bgW, bgH);
 
     // 2. Central Castle Objective Beacon (Entrance at ref 470, 405)
     const objX = this.mapX(470);
     const objY = this.mapY(405);
-    const beaconScale = Math.max(1.2, 1.5 * (bgH / 682));
+    const beaconScale = Math.max(0.9, 1.2 * (bgH / 682));
 
     this.objectivePulse = this.add.sprite(objX, objY, 'objective_pulse');
     this.objectivePulse.setScale(beaconScale);
@@ -805,19 +817,19 @@ class TacticalArenaScene extends Phaser.Scene {
     this.objectivePulse.setTint(0xffd600); // Yellow neutral pulse
 
     this.objectiveFlag = this.add.sprite(objX, this.mapY(360), 'objective_flag');
-    this.objectiveFlag.setScale(beaconScale * 0.9);
+    this.objectiveFlag.setScale(beaconScale * 0.85);
     this.objectiveFlag.play('anim-flag');
 
-    this.objectiveText = this.add.text(objX, this.mapY(305), 'LÂU ĐÀI TRUNG TÂM [TRANH CHẤP]', {
+    this.objectiveText = this.add.text(objX, this.mapY(305), 'LÂU ĐÀI TRUNG TÂM', {
       fontFamily: 'Plus Jakarta Sans',
-      fontSize: `${Math.round(Math.max(12, 14 * (bgW / 1024)))}px`,
+      fontSize: `${Math.round(Math.max(10, 12 * (bgW / 1024)))}px`,
       fontStyle: 'bold',
       color: '#18181B',
       backgroundColor: '#FEF3C7',
-      padding: { x: 10, y: 4 }
+      padding: { x: 8, y: 3 }
     }).setOrigin(0.5);
 
-    // Zoom in close-up on start of battle
+    // Full overview camera
     this.applyCombatCamera(false);
   }
 
@@ -839,7 +851,7 @@ class TacticalArenaScene extends Phaser.Scene {
       const ref = humanRefPositions[idx];
       const posX = this.mapX(ref.x);
       const posY = this.mapY(ref.y);
-      const labelOffset = 25 * (unitScale / 2.3);
+      const labelOffset = 20 * (unitScale / 1.8);
 
       if (this.unitSprites[p.id]) {
         this.unitSprites[p.id].sprite.setPosition(posX, posY);
@@ -853,12 +865,12 @@ class TacticalArenaScene extends Phaser.Scene {
         sprite.play(`${p.unitClass}-idle`, true);
 
         const label = this.add.text(posX, posY - labelOffset, p.name, {
-          fontFamily: 'Chakra Petch',
-          fontSize: '11px',
+          fontFamily: 'Plus Jakarta Sans',
+          fontSize: '10px',
           fontStyle: 'bold',
-          color: '#38bdf8',
-          backgroundColor: '#082f49',
-          padding: { x: 5, y: 2 }
+          color: '#0369A1',
+          backgroundColor: '#E0F2FE',
+          padding: { x: 4, y: 1 }
         }).setOrigin(0.5);
 
         this.unitSprites[p.id] = { sprite, label, team: 'human', unitClass: p.unitClass, refX: ref.x, refY: ref.y };
@@ -879,7 +891,7 @@ class TacticalArenaScene extends Phaser.Scene {
       const ref = robotRefPositions[idx];
       const posX = this.mapX(ref.x);
       const posY = this.mapY(ref.y);
-      const labelOffset = 25 * (unitScale / 2.3);
+      const labelOffset = 20 * (unitScale / 1.8);
 
       if (this.unitSprites[p.id]) {
         this.unitSprites[p.id].sprite.setPosition(posX, posY);
@@ -894,12 +906,12 @@ class TacticalArenaScene extends Phaser.Scene {
         sprite.play(`${p.unitClass}-idle`, true);
 
         const label = this.add.text(posX, posY - labelOffset, p.name, {
-          fontFamily: 'Chakra Petch',
-          fontSize: '11px',
+          fontFamily: 'Plus Jakarta Sans',
+          fontSize: '10px',
           fontStyle: 'bold',
-          color: '#fb7185',
-          backgroundColor: '#4c0519',
-          padding: { x: 5, y: 2 }
+          color: '#BE123C',
+          backgroundColor: '#FFE4E6',
+          padding: { x: 4, y: 1 }
         }).setOrigin(0.5);
 
         this.unitSprites[p.id] = { sprite, label, team: 'robot', unitClass: p.unitClass, refX: ref.x, refY: ref.y };
@@ -916,7 +928,7 @@ class TacticalArenaScene extends Phaser.Scene {
   }
 
   onNewQuestion() {
-    this.applyCombatCamera(true);
+    this.applyCombatCamera(false);
     Object.values(this.unitSprites).forEach(u => {
       u.sprite.play(`${u.unitClass}-idle`, true);
     });
