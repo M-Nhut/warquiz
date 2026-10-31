@@ -111,11 +111,17 @@ function renderQuestions() {
       const bgs = ['bg-[#FFE4E6]', 'bg-[#E0F2FE]', 'bg-[#FEF3C7]', 'bg-[#DCFCE7]'];
       const labels = ['A', 'B', 'C', 'D'];
       return `
-        <div class="flex items-center gap-2 p-1.5 rounded-lg border border-[#18181B] ${bgs[optIdx]}">
-          <input type="radio" name="correct_${idx}" value="${optIdx}" ${isChecked} onchange="updateCorrectIndex(${idx}, ${optIdx})" class="w-4 h-4 cursor-pointer accent-[#18181B]">
-          <span class="text-xs font-black w-4 text-[#18181B]">${labels[optIdx]}:</span>
-          <input type="text" value="${escapeHtml(val)}" onchange="updateOptionText(${idx}, ${optIdx}, this.value)" 
-                 class="w-full bg-white border border-[#18181B] rounded px-2.5 py-1 text-xs text-[#18181B] font-bold focus:outline-none">
+        <div class="flex flex-col gap-1.5 p-2 rounded-lg border border-[#18181B] ${bgs[optIdx]}">
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correct_${idx}" value="${optIdx}" ${isChecked} onchange="updateCorrectIndex(${idx}, ${optIdx})" class="w-4 h-4 cursor-pointer accent-[#18181B]">
+            <span class="text-xs font-black w-4 text-[#18181B]">${labels[optIdx]}:</span>
+            <input type="text" id="opt_input_${idx}_${optIdx}" value="${escapeHtml(val)}" 
+                   placeholder="Nhập đáp án (vd: $x = \\pm 2$)..."
+                   onchange="updateOptionText(${idx}, ${optIdx}, this.value)" 
+                   class="w-full bg-white border border-[#18181B] rounded px-2.5 py-1 text-xs text-[#18181B] font-bold focus:outline-none">
+          </div>
+          <!-- Live LaTeX Preview for Option -->
+          <div id="opt_preview_${idx}_${optIdx}" class="latex-preview-box hidden text-xs"></div>
         </div>
       `;
     }).join('');
@@ -131,16 +137,39 @@ function renderQuestions() {
       </div>
 
       <div class="mb-3">
-        <label class="block text-xs font-black text-[#18181B] mb-1">Nội dung câu hỏi:</label>
-        <textarea rows="2" onchange="updateQuestionText(${idx}, this.value)" 
+        <div class="flex items-center justify-between mb-1">
+          <label class="block text-xs font-black text-[#18181B]">Nội dung câu hỏi (cho phép nhập $LaTeX$):</label>
+          <span class="text-[10px] text-[#52525B] font-bold">Kẹp $...$ để tạo công thức</span>
+        </div>
+        <textarea id="q_input_${idx}" rows="2" onchange="updateQuestionText(${idx}, this.value)" 
+                  placeholder="Ví dụ: Tính giá trị của biểu thức $P = \\int_0^1 x^2 dx$..."
                   class="w-full bg-white border-2 border-[#18181B] rounded-xl p-2.5 text-sm text-[#18181B] font-bold focus:outline-none shadow-[1px_1px_0px_#18181B]">${escapeHtml(q.question || '')}</textarea>
+        <!-- Live LaTeX Preview for Question -->
+        <div id="q_preview_${idx}" class="latex-preview-box hidden"></div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         ${optsHtml}
       </div>
     `;
     questionsAccordion.appendChild(qCard);
+
+    // Setup real-time live LaTeX previews
+    setTimeout(() => {
+      const qInput = document.getElementById(`q_input_${idx}`);
+      const qPreview = document.getElementById(`q_preview_${idx}`);
+      if (window.setupLatexPreview && qInput && qPreview) {
+        window.setupLatexPreview(qInput, qPreview);
+      }
+
+      [0, 1, 2, 3].forEach(optIdx => {
+        const optInput = document.getElementById(`opt_input_${idx}_${optIdx}`);
+        const optPreview = document.getElementById(`opt_preview_${idx}_${optIdx}`);
+        if (window.setupLatexPreview && optInput && optPreview) {
+          window.setupLatexPreview(optInput, optPreview);
+        }
+      });
+    }, 10);
   });
 }
 

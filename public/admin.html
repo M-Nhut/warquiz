@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Quản Lý Ngân Hàng Câu Hỏi | RobotWar</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=2.3">
+  <!-- KaTeX LaTeX Math Engine -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="/js/latex-helper.js?v=2.3"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="p-4 md:p-8 bg-[#FAF8F5] text-[#18181B] font-['Plus_Jakarta_Sans',sans-serif]">
@@ -90,6 +95,18 @@
             </div>
           </div>
 
+          <!-- LaTeX Helper Banner -->
+          <div class="p-3.5 rounded-xl bg-[#EFF6FF] border-2 border-[#18181B] shadow-[2px_2px_0px_#18181B] flex items-start gap-2.5 text-xs text-[#1E3A8A]">
+            <span class="text-base select-none">📐</span>
+            <div class="flex-1">
+              <span class="font-black text-[#1E40AF] uppercase tracking-wide">Hỗ Trợ Nhập Công Thức Toán / Lý / Hóa (LaTeX):</span>
+              <p class="font-medium text-[#1E3A8A] mt-0.5 leading-relaxed">
+                Kẹp công thức giữa dấu <code class="bg-white border border-[#18181B] px-1 py-0.5 rounded font-mono font-bold text-[#E11D48]">$công_thức$</code> (nội dòng) hoặc <code class="bg-white border border-[#18181B] px-1 py-0.5 rounded font-mono font-bold text-[#E11D48]">$$công_thức$$</code> (hiển thị khối lớn).
+                <br>Ví dụ: <code class="bg-white px-1.5 py-0.5 border border-[#CBD5E1] rounded font-mono font-semibold">$E = mc^2$</code>, <code class="bg-white px-1.5 py-0.5 border border-[#CBD5E1] rounded font-mono font-semibold">$\frac{-b \pm \sqrt{\Delta}}{2a}$</code>, <code class="bg-white px-1.5 py-0.5 border border-[#CBD5E1] rounded font-mono font-semibold">$\vec{F} = m\vec{a}$</code>, <code class="bg-white px-1.5 py-0.5 border border-[#CBD5E1] rounded font-mono font-semibold">$x^2 + y^2 = r^2$</code>.
+              </p>
+            </div>
+          </div>
+
           <!-- Questions List Section -->
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -113,6 +130,6 @@
   </div>
 
   <script src="/js/audio-fx.js"></script>
-  <script src="/js/admin.js"></script>
+  <script src="/js/admin.js?v=2.3"></script>
 </body>
 </html>

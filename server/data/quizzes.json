@@ -149,10 +149,10 @@
         "id": "s2",
         "question": "Vận tốc ánh sáng trong chân không xấp xỉ bao nhiêu km/giây?",
         "options": [
-          "150.000 km/s",
-          "300.000 km/s",
-          "1.000.000 km/s",
-          "30.000 km/s"
+          "Khoảng $150.000\\text{ km/s}$",
+          "$c \\approx 300.000\\text{ km/s}$",
+          "Khoảng $1.000.000\\text{ km/s}$",
+          "Khoảng $30.000\\text{ km/s}$"
         ],
         "correctIndex": 1,
         "difficulty": 1
@@ -185,10 +185,10 @@
         "id": "s5",
         "question": "Trọng lực trên bề mặt Mặt Trăng bằng khoảng bao nhiêu phần so với Trái Đất?",
         "options": [
-          "Khoảng 1/2",
-          "Khoảng 1/6",
-          "Khoảng 1/10",
-          "Khoảng 1/3"
+          "Khoảng $\\frac{1}{2}$",
+          "Khoảng $\\frac{1}{6}$",
+          "Khoảng $\\frac{1}{10}$",
+          "Khoảng $\\frac{1}{3}$"
         ],
         "correctIndex": 1,
         "difficulty": 1
@@ -260,6 +260,134 @@
         ],
         "correctIndex": 0,
         "difficulty": 1
+      }
+    ]
+  },
+  {
+    "id": "quiz-math-physics",
+    "title": "Toán Học & Vật Lý Lý Thuyết (LaTeX Formula)",
+    "description": "Đấu trường khoa học đỉnh cao với các định luật vật lý, phương trình toán học và hằng số vũ trụ chuẩn LaTeX",
+    "timePerQuestion": 15,
+    "questions": [
+      {
+        "id": "mp-1",
+        "question": "Phương trình tương đương khối lượng – năng lượng của Einstein được viết dưới dạng công thức nào?",
+        "options": [
+          "$E = mc^2$",
+          "$F = ma$",
+          "$E = \\frac{1}{2}mv^2$",
+          "$PV = nRT$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "mp-2",
+        "question": "Nghiệm của phương trình bậc hai $ax^2 + bx + c = 0$ ($a \\neq 0$) khi biệt thức $\\Delta = b^2 - 4ac > 0$ là:",
+        "options": [
+          "$x = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}$",
+          "$x = \\frac{-b \\pm \\Delta}{a}$",
+          "$x = \\frac{b \\pm \\sqrt{\\Delta}}{2a}$",
+          "$x = \\frac{-b}{2a}$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 2
+      },
+      {
+        "id": "mp-3",
+        "question": "Định luật II Newton về động lực học chất điểm được biểu diễn bằng phương trình vectơ nào?",
+        "options": [
+          "$\\vec{F} = m\\vec{a}$",
+          "$\\vec{p} = m\\vec{v}$",
+          "$A = \\vec{F} \\cdot \\vec{s}$",
+          "$\\vec{F} = -k\\vec{x}$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "mp-4",
+        "question": "Định lý Pythagoras trong tam giác vuông có 2 cạnh góc vuông $a, b$ và cạnh huyền $c$ là:",
+        "options": [
+          "$a^2 + b^2 = c^2$",
+          "$a + b = c$",
+          "$a^2 - b^2 = c^2$",
+          "$c = \\sqrt{a + b}$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "mp-5",
+        "question": "Định luật Vạn vật hấp dẫn của Newton giữa hai chất điểm $m_1, m_2$ cách nhau khoảng cách $r$ là:",
+        "options": [
+          "$F = G \\frac{m_1 m_2}{r^2}$",
+          "$F = G \\frac{m_1 + m_2}{r}$",
+          "$F = m g r^2$",
+          "$F = \\frac{1}{2} G m_1 m_2 r$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 2
+      },
+      {
+        "id": "mp-6",
+        "question": "Công thức tính đạo hàm của hàm lũy thừa $f(x) = x^n$ ($n \\in \\mathbb{R}$) là:",
+        "options": [
+          "$f'(x) = n x^{n-1}$",
+          "$f'(x) = x^{n-1}$",
+          "$f'(x) = (n-1)x^n$",
+          "$f'(x) = n x^n$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 2
+      },
+      {
+        "id": "mp-7",
+        "question": "Công thức tính diện tích hình tròn $S$ theo bán kính $r$ là:",
+        "options": [
+          "$S = \\pi r^2$",
+          "$C = 2\\pi r$",
+          "$S = 4\\pi r^2$",
+          "$S = \\frac{4}{3}\\pi r^3$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "mp-8",
+        "question": "Chu kỳ dao động điều hòa $T$ của con lắc đơn có chiều dài dây $l$ tại nơi có gia tốc $g$ là:",
+        "options": [
+          "$T = 2\\pi \\sqrt{\\frac{l}{g}}$",
+          "$T = 2\\pi \\sqrt{\\frac{g}{l}}$",
+          "$T = \\frac{1}{2\\pi}\\sqrt{\\frac{l}{g}}$",
+          "$T = \\sqrt{\\frac{l}{g}}$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 2
+      },
+      {
+        "id": "mp-9",
+        "question": "Phương trình trạng thái của khí lý tưởng liên hệ giữa áp suất $P$, thể tích $V$ và nhiệt độ $T$ là:",
+        "options": [
+          "$PV = nRT$",
+          "$P = \\frac{F}{S}$",
+          "$Q = mc\\Delta T$",
+          "$U = \\frac{3}{2}nRT$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "mp-10",
+        "question": "Đẳng thức Euler nổi tiếng kết nối 5 hằng số cơ bản ($e, i, \\pi, 1, 0$) có dạng:",
+        "options": [
+          "$e^{i\\pi} + 1 = 0$",
+          "$e^\\pi + 1 = 0$",
+          "$e^{i\\pi} = 1$",
+          "$\\ln(e) = 0$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 3
       }
     ]
   }

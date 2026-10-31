@@ -290,11 +290,16 @@ socket.on('new_question', (data) => {
 
   qCounter.textContent = `Câu hỏi ${data.questionIndex + 1} / ${data.totalQuestions}`;
   qTimer.textContent = `${data.remainingSec}s`;
-  qText.textContent = data.question;
-
-  // Reset answer options styling
-  for (let i = 0; i < 4; i++) {
-    optTexts[i].textContent = data.options[i] || `Đáp án ${i + 1}`;
+  if (window.renderLatex) {
+    window.renderLatex(qText, data.question);
+    for (let i = 0; i < 4; i++) {
+      window.renderLatex(optTexts[i], data.options[i] || `Đáp án ${i + 1}`);
+    }
+  } else {
+    qText.textContent = data.question;
+    for (let i = 0; i < 4; i++) {
+      optTexts[i].textContent = data.options[i] || `Đáp án ${i + 1}`;
+    }
   }
 
   const buttons = answersGrid.querySelectorAll('.quiz-option');
@@ -378,7 +383,12 @@ socket.on('round_result', (data) => {
   const myAction = data.actions.find(a => a.playerId === socket.id);
   const isCorrect = myAction ? myAction.isCorrect : false;
 
-  feedbackCorrectText.textContent = `${['A', 'B', 'C', 'D'][data.correctIndex]}: ${data.correctText}`;
+  const correctLabel = ['A', 'B', 'C', 'D'][data.correctIndex];
+  if (window.renderLatex) {
+    window.renderLatex(feedbackCorrectText, `${correctLabel}: ${data.correctText}`);
+  } else {
+    feedbackCorrectText.textContent = `${correctLabel}: ${data.correctText}`;
+  }
 
   // Update Objective Capture Status on Mobile
   const playerObjStatus = document.getElementById('player-obj-status');

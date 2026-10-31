@@ -266,10 +266,18 @@ socket.on('new_question', (data) => {
   hudTimer.textContent = data.remainingSec;
   hudTimer.classList.remove('timer-warning');
 
-  battleQuestionText.textContent = data.question;
-  for (let i = 0; i < 4; i++) {
-    bOptTexts[i].textContent = data.options[i] || '';
-    bOptCards[i].classList.remove('opt-correct', 'opt-wrong');
+  if (window.renderLatex) {
+    window.renderLatex(battleQuestionText, data.question);
+    for (let i = 0; i < 4; i++) {
+      window.renderLatex(bOptTexts[i], data.options[i] || '');
+      bOptCards[i].classList.remove('opt-correct', 'opt-wrong');
+    }
+  } else {
+    battleQuestionText.textContent = data.question;
+    for (let i = 0; i < 4; i++) {
+      bOptTexts[i].textContent = data.options[i] || '';
+      bOptCards[i].classList.remove('opt-correct', 'opt-wrong');
+    }
   }
 
   if (battleScene && battleScene.isReady) {

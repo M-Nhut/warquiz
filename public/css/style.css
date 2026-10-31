@@ -533,3 +533,40 @@ html, body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ================= KATEX MATH FORMULA STYLING ================= */
+.katex {
+  font-size: 1.08em;
+  text-rendering: auto;
+  line-height: 1.25;
+}
+
+.katex-display {
+  margin: 0.4em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+
+.katex-display > .katex {
+  white-space: normal;
+  text-align: center;
+}
+
+/* Question Option Math Alignment */
+.battle-opt-btn .katex,
+.option-btn .katex {
+  font-size: 1.1em;
+}
+
+/* Live LaTeX Math Preview Box in Admin */
+.latex-preview-box {
+  background-color: #F8FAFC;
+  border: 1.5px dashed #94A3B8;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #0F172A;
+  margin-top: 4px;
+  box-shadow: 1px 1px 0px #CBD5E1;
+}
