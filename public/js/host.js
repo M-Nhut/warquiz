@@ -221,35 +221,35 @@ socket.on('roster_updated', (data) => {
 
 function renderRoster() {
   if (currentRoster.human.length === 0) {
-    rosterHuman.innerHTML = '<div class="text-slate-600 text-xs italic text-center py-10">Đang chờ người chơi quét mã...</div>';
+    rosterHuman.innerHTML = '<div class="text-[#52525B] text-xs italic text-center py-10 font-semibold">Đang chờ chiến binh quét mã...</div>';
   } else {
     rosterHuman.innerHTML = currentRoster.human.map(p => `
-      <div class="flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-cyan-900/60 shadow">
-        <div class="w-8 h-8 rounded bg-cyan-950 border border-cyan-500/50 flex items-center justify-center overflow-hidden">
+      <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white border-2 border-[#18181B] shadow-[2px_3px_0px_#18181B]">
+        <div class="w-9 h-9 rounded-lg bg-[#E0F2FE] border-2 border-[#18181B] flex items-center justify-center overflow-hidden">
           <img src="/robotwar/Soldiers/${p.unitClass}.png" class="sprite-icon w-8 h-8 object-cover object-top scale-150">
         </div>
         <div class="flex-1 truncate">
-          <div class="font-bold text-sm text-cyan-300 truncate">${escapeHtml(p.name)}</div>
-          <div class="text-[10px] text-slate-400">${p.unitClass}</div>
+          <div class="font-bold text-sm text-[#18181B] truncate">${escapeHtml(p.name)}</div>
+          <div class="text-[10px] text-[#52525B] font-semibold">${p.unitClass}</div>
         </div>
-        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#0284C7] border border-[#18181B]"></span>
       </div>
     `).join('');
   }
 
   if (currentRoster.robot.length === 0) {
-    rosterRobot.innerHTML = '<div class="text-slate-600 text-xs italic text-center py-10">Đang chờ người chơi quét mã...</div>';
+    rosterRobot.innerHTML = '<div class="text-[#52525B] text-xs italic text-center py-10 font-semibold">Đang chờ robot quét mã...</div>';
   } else {
     rosterRobot.innerHTML = currentRoster.robot.map(p => `
-      <div class="flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-rose-900/60 shadow">
-        <div class="w-8 h-8 rounded bg-rose-950 border border-rose-500/50 flex items-center justify-center overflow-hidden">
+      <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white border-2 border-[#18181B] shadow-[2px_3px_0px_#18181B]">
+        <div class="w-9 h-9 rounded-lg bg-[#FFE4E6] border-2 border-[#18181B] flex items-center justify-center overflow-hidden">
           <img src="/robotwar/Robots/${p.unitClass}.png" class="sprite-icon w-8 h-8 object-cover object-top scale-150">
         </div>
         <div class="flex-1 truncate">
-          <div class="font-bold text-sm text-rose-300 truncate">${escapeHtml(p.name)}</div>
-          <div class="text-[10px] text-slate-400">${p.unitClass}</div>
+          <div class="font-bold text-sm text-[#18181B] truncate">${escapeHtml(p.name)}</div>
+          <div class="text-[10px] text-[#52525B] font-semibold">${p.unitClass}</div>
         </div>
-        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#E11D48] border border-[#18181B]"></span>
       </div>
     `).join('');
   }
@@ -373,6 +373,10 @@ function showVictory(data) {
   hostBattle.classList.add('hidden');
   hostVictory.classList.remove('hidden');
 
+  if (battleScene && battleScene.isReady) {
+    battleScene.applyFullOverviewCamera(true);
+  }
+
   if (window.soundFX) window.soundFX.playVictory();
   if (window.launchConfetti) window.launchConfetti(5000);
 
@@ -390,26 +394,30 @@ function showVictory(data) {
   victoryReasonText.textContent = data.reason || 'Trận chiến đã kết thúc.';
 
   const mvps = data.mvpList || [];
-  const rankColors = ['border-amber-400 bg-amber-950/40 text-amber-300', 'border-slate-400 bg-slate-900/60 text-slate-200', 'border-amber-700 bg-amber-950/20 text-amber-500'];
-  const rankLabels = ['🥇 MVP #1', '🥈 TOP #2', '🥉 TOP #3'];
+  const rankCards = [
+    { label: '🥇 MVP #1', border: 'border-[#F59E0B]', bg: 'bg-[#FEF3C7]', text: 'text-[#B45309]', shadow: 'shadow-[4px_5px_0px_#18181B]' },
+    { label: '🥈 TOP #2', border: 'border-[#18181B]', bg: 'bg-[#F4EFE6]', text: 'text-[#18181B]', shadow: 'shadow-[3px_4px_0px_#18181B]' },
+    { label: '🥉 TOP #3', border: 'border-[#18181B]', bg: 'bg-[#FAF8F5]', text: 'text-[#52525B]', shadow: 'shadow-[3px_4px_0px_#18181B]' }
+  ];
 
   const orderedIndices = [1, 0, 2];
   podiumGrid.innerHTML = orderedIndices.map(idx => {
     const p = mvps[idx];
-    if (!p) return '<div class="taste-card p-4 flex flex-col items-center justify-center h-44 text-slate-600 text-xs italic">Trống</div>';
+    const styling = rankCards[idx];
+    if (!p) return '<div class="taste-card p-4 flex flex-col items-center justify-center h-44 text-[#52525B] text-xs italic">Trống</div>';
     const isHuman = p.team === 'human';
-    const heightClass = idx === 0 ? 'h-56 -mt-3 border-2' : 'h-48 border';
+    const heightClass = idx === 0 ? 'h-60 -mt-4 border-[3px]' : 'h-52 border-[2.5px]';
 
     return `
-      <div class="taste-card p-4 flex flex-col items-center justify-center ${heightClass} ${rankColors[idx]}">
-        <span class="text-xs font-black uppercase tracking-wider mb-2">${rankLabels[idx]}</span>
-        <div class="w-12 h-12 rounded-lg bg-slate-950 border border-slate-700 flex items-center justify-center overflow-hidden mb-2">
+      <div class="taste-card p-4 flex flex-col items-center justify-center ${heightClass} ${styling.bg} ${styling.shadow}">
+        <span class="text-xs font-black uppercase tracking-wider mb-2 ${styling.text}">${styling.label}</span>
+        <div class="w-12 h-12 rounded-xl bg-white border-2 border-[#18181B] flex items-center justify-center overflow-hidden mb-2 shadow-[2px_2px_0px_#18181B]">
           <img src="/robotwar/${isHuman ? 'Soldiers' : 'Robots'}/${p.unitClass}.png" class="sprite-icon w-12 h-12 object-cover object-top scale-150">
         </div>
-        <div class="font-black text-sm text-white truncate max-w-full">${escapeHtml(p.name)}</div>
-        <div class="text-[10px] text-slate-400">${p.unitClass}</div>
-        <div class="mt-2 text-sm font-mono font-black text-cyan-400">${p.score} AP</div>
-        <div class="text-[10px] text-slate-400">${p.correctCount}/${p.totalAnswered} câu đúng</div>
+        <div class="font-black text-sm text-[#18181B] truncate max-w-full">${escapeHtml(p.name)}</div>
+        <div class="text-[10px] text-[#52525B] font-semibold">${p.unitClass}</div>
+        <div class="mt-2 text-sm font-mono font-black ${isHuman ? 'text-[#0284C7]' : 'text-[#E11D48]'}">${p.score} AP</div>
+        <div class="text-[10px] text-[#52525B] font-medium">${p.correctCount}/${p.totalAnswered} câu đúng</div>
       </div>
     `;
   }).join('');
@@ -454,20 +462,51 @@ class TacticalArenaScene extends Phaser.Scene {
     this.objectiveFlag = null;
     this.objectiveText = null;
     this.mapBg = null;
+    this.mapDisplayW = 1024;
+    this.mapDisplayH = 682;
+    this.mapOriginX = 0;
+    this.mapOriginY = 0;
   }
 
-  // Responsive full-screen coordinate mapper (maps 1024x682 Kingdom Map reference to current screen)
+  // Exact native aspect ratio coordinate mapper (Preserves 1024:682 without any distortion)
   mapX(refX) {
-    return (refX / 1024) * this.scale.width;
+    return this.mapOriginX + (refX / 1024) * this.mapDisplayW;
   }
 
   mapY(refY) {
-    return (refY / 682) * this.scale.height;
+    return this.mapOriginY + (refY / 682) * this.mapDisplayH;
   }
 
   getUnitScale() {
-    const factor = Math.min(this.scale.width / 1024, this.scale.height / 682);
-    return Math.max(1.8, Math.min(3.8, 2.3 * Math.max(0.8, factor)));
+    const factor = this.mapDisplayW / 1024;
+    return Math.max(2.4, Math.min(4.5, 2.7 * Math.max(0.9, factor)));
+  }
+
+  applyCombatCamera(animate = true) {
+    // Focus in close-up on central castle corridor and front battle line
+    const targetX = this.mapX(470);
+    const targetY = this.mapY(380);
+    const combatZoom = 1.48;
+
+    if (animate) {
+      this.cameras.main.pan(targetX, targetY, 700, 'Power2');
+      this.cameras.main.zoomTo(combatZoom, 700, 'Power2');
+    } else {
+      this.cameras.main.centerOn(targetX, targetY);
+      this.cameras.main.setZoom(combatZoom);
+    }
+  }
+
+  applyFullOverviewCamera(animate = true) {
+    const w = this.scale.width;
+    const h = this.scale.height;
+    if (animate) {
+      this.cameras.main.pan(w / 2, h / 2, 800, 'Power2');
+      this.cameras.main.zoomTo(1.0, 800, 'Power2');
+    } else {
+      this.cameras.main.centerOn(w / 2, h / 2);
+      this.cameras.main.setZoom(1.0);
+    }
   }
 
   preload() {
@@ -545,14 +584,33 @@ class TacticalArenaScene extends Phaser.Scene {
   }
 
   handleResize(width, height) {
+    const MAP_W = 1024;
+    const MAP_H = 682;
+    const mapAspect = MAP_W / MAP_H;
+    const screenAspect = width / height;
+
+    let bgW, bgH;
+    if (screenAspect > mapAspect) {
+      bgW = width;
+      bgH = width / mapAspect;
+    } else {
+      bgH = height;
+      bgW = height * mapAspect;
+    }
+
+    this.mapDisplayW = bgW;
+    this.mapDisplayH = bgH;
+    this.mapOriginX = (width - bgW) / 2;
+    this.mapOriginY = (height - bgH) / 2;
+
     if (this.mapBg) {
       this.mapBg.setPosition(width / 2, height / 2);
-      this.mapBg.setDisplaySize(width, height);
+      this.mapBg.setDisplaySize(bgW, bgH);
     }
 
     const objX = this.mapX(470);
     const objY = this.mapY(405);
-    const beaconScale = Math.max(1.1, 1.4 * (height / 682));
+    const beaconScale = Math.max(1.2, 1.5 * (bgH / 682));
 
     if (this.objectivePulse) {
       this.objectivePulse.setPosition(objX, objY);
@@ -560,11 +618,11 @@ class TacticalArenaScene extends Phaser.Scene {
     }
     if (this.objectiveFlag) {
       this.objectiveFlag.setPosition(objX, this.mapY(360));
-      this.objectiveFlag.setScale(beaconScale * 0.85);
+      this.objectiveFlag.setScale(beaconScale * 0.9);
     }
     if (this.objectiveText) {
       this.objectiveText.setPosition(objX, this.mapY(305));
-      this.objectiveText.setFontSize(`${Math.round(Math.max(11, 13 * (width / 1024)))}px`);
+      this.objectiveText.setFontSize(`${Math.round(Math.max(12, 14 * (bgW / 1024)))}px`);
     }
 
     // Reposition all active unit sprites
@@ -578,6 +636,8 @@ class TacticalArenaScene extends Phaser.Scene {
         u.label.setPosition(nx, ny - (25 * (uScale / 2.3)));
       }
     });
+
+    this.applyCombatCamera(false);
   }
 
   createAnimations() {
@@ -710,14 +770,34 @@ class TacticalArenaScene extends Phaser.Scene {
     const w = this.scale.width;
     const h = this.scale.height;
 
-    // 1. Kingdom Arena Fullscreen Background (Edge-to-edge)
+    // Exact 1024:682 native aspect ratio calculation (No stretching, no distortion)
+    const MAP_W = 1024;
+    const MAP_H = 682;
+    const mapAspect = MAP_W / MAP_H;
+    const screenAspect = w / h;
+
+    let bgW, bgH;
+    if (screenAspect > mapAspect) {
+      bgW = w;
+      bgH = w / mapAspect;
+    } else {
+      bgH = h;
+      bgW = h * mapAspect;
+    }
+
+    this.mapDisplayW = bgW;
+    this.mapDisplayH = bgH;
+    this.mapOriginX = (w - bgW) / 2;
+    this.mapOriginY = (h - bgH) / 2;
+
+    // 1. Kingdom Arena Fullscreen Background
     this.mapBg = this.add.image(w / 2, h / 2, 'map_kingdom');
-    this.mapBg.setDisplaySize(w, h);
+    this.mapBg.setDisplaySize(bgW, bgH);
 
     // 2. Central Castle Objective Beacon (Entrance at ref 470, 405)
     const objX = this.mapX(470);
     const objY = this.mapY(405);
-    const beaconScale = Math.max(1.1, 1.4 * (h / 682));
+    const beaconScale = Math.max(1.2, 1.5 * (bgH / 682));
 
     this.objectivePulse = this.add.sprite(objX, objY, 'objective_pulse');
     this.objectivePulse.setScale(beaconScale);
@@ -725,17 +805,20 @@ class TacticalArenaScene extends Phaser.Scene {
     this.objectivePulse.setTint(0xffd600); // Yellow neutral pulse
 
     this.objectiveFlag = this.add.sprite(objX, this.mapY(360), 'objective_flag');
-    this.objectiveFlag.setScale(beaconScale * 0.85);
+    this.objectiveFlag.setScale(beaconScale * 0.9);
     this.objectiveFlag.play('anim-flag');
 
     this.objectiveText = this.add.text(objX, this.mapY(305), 'LÂU ĐÀI TRUNG TÂM [TRANH CHẤP]', {
-      fontFamily: 'Chakra Petch',
-      fontSize: `${Math.round(Math.max(11, 13 * (w / 1024)))}px`,
+      fontFamily: 'Plus Jakarta Sans',
+      fontSize: `${Math.round(Math.max(12, 14 * (bgW / 1024)))}px`,
       fontStyle: 'bold',
-      color: '#f59e0b',
-      backgroundColor: '#0c1222',
-      padding: { x: 8, y: 3 }
+      color: '#18181B',
+      backgroundColor: '#FEF3C7',
+      padding: { x: 10, y: 4 }
     }).setOrigin(0.5);
+
+    // Zoom in close-up on start of battle
+    this.applyCombatCamera(false);
   }
 
   syncUnits(roster) {
@@ -833,6 +916,7 @@ class TacticalArenaScene extends Phaser.Scene {
   }
 
   onNewQuestion() {
+    this.applyCombatCamera(true);
     Object.values(this.unitSprites).forEach(u => {
       u.sprite.play(`${u.unitClass}-idle`, true);
     });

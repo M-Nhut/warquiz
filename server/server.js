@@ -414,7 +414,12 @@ io.on('connection', (socket) => {
   });
 
   // HOST: Start Game
-  socket.on('host_start_game', ({ roomId }, callback) => {
+  socket.on('host_start_game', (data = {}, callback) => {
+    let roomId = data.roomId;
+    if (!roomId) {
+      const foundRoom = Object.values(rooms).find(r => r.hostSocketId === socket.id);
+      if (foundRoom) roomId = foundRoom.id;
+    }
     const room = rooms[roomId];
     if (!room) return;
     if (room.status !== 'lobby') return;

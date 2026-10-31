@@ -35,24 +35,24 @@ function renderQuizList() {
   quizListEl.innerHTML = '';
 
   if (currentQuizzes.length === 0) {
-    quizListEl.innerHTML = '<div class="text-slate-500 text-sm">Chưa có bộ câu hỏi nào.</div>';
+    quizListEl.innerHTML = '<div class="text-[#52525B] text-sm italic font-medium">Chưa có bộ câu hỏi nào.</div>';
     return;
   }
 
   currentQuizzes.forEach(q => {
     const isSelected = activeQuiz && activeQuiz.id === q.id;
     const item = document.createElement('div');
-    item.className = `p-3 rounded-lg border cursor-pointer transition-all ${
+    item.className = `p-3.5 rounded-xl border-2 border-[#18181B] cursor-pointer transition-all ${
       isSelected
-        ? 'bg-slate-800 border-amber-400 shadow-md'
-        : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+        ? 'bg-[#FEF3C7] shadow-[3px_3px_0px_#18181B]'
+        : 'bg-[#FAF8F5] hover:bg-white shadow-[2px_2px_0px_#18181B]'
     }`;
     item.innerHTML = `
       <div class="flex items-center justify-between mb-1">
-        <h4 class="font-bold text-sm text-slate-200 truncate">${q.title}</h4>
-        <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 font-mono">${q.questionCount || 0} câu</span>
+        <h4 class="font-black text-sm text-[#18181B] truncate">${escapeHtml(q.title)}</h4>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-white border border-[#18181B] text-[#0284C7] font-mono font-bold">${q.questionCount || 0} câu</span>
       </div>
-      <p class="text-xs text-slate-400 truncate">${q.description || 'Không có mô tả'}</p>
+      <p class="text-xs text-[#52525B] font-semibold truncate">${escapeHtml(q.description || 'Không có mô tả')}</p>
     `;
     item.onclick = () => selectQuiz(q.id);
     quizListEl.appendChild(item);
@@ -103,37 +103,37 @@ function renderQuestions() {
 
   questions.forEach((q, idx) => {
     const qCard = document.createElement('div');
-    qCard.className = 'bg-slate-900 border border-slate-800 rounded-lg p-4 relative';
+    qCard.className = 'bg-[#FAF8F5] border-2 border-[#18181B] rounded-xl p-4 relative shadow-[2px_3px_0px_#18181B]';
 
     const optsHtml = [0, 1, 2, 3].map(optIdx => {
       const val = (q.options && q.options[optIdx]) || '';
       const isChecked = q.correctIndex === optIdx ? 'checked' : '';
-      const colors = ['border-red-500/50', 'border-blue-500/50', 'border-amber-500/50', 'border-emerald-500/50'];
+      const bgs = ['bg-[#FFE4E6]', 'bg-[#E0F2FE]', 'bg-[#FEF3C7]', 'bg-[#DCFCE7]'];
       const labels = ['A', 'B', 'C', 'D'];
       return `
-        <div class="flex items-center gap-2">
-          <input type="radio" name="correct_${idx}" value="${optIdx}" ${isChecked} onchange="updateCorrectIndex(${idx}, ${optIdx})" class="w-4 h-4 text-emerald-500 cursor-pointer">
-          <span class="text-xs font-bold w-4 text-slate-400">${labels[optIdx]}:</span>
+        <div class="flex items-center gap-2 p-1.5 rounded-lg border border-[#18181B] ${bgs[optIdx]}">
+          <input type="radio" name="correct_${idx}" value="${optIdx}" ${isChecked} onchange="updateCorrectIndex(${idx}, ${optIdx})" class="w-4 h-4 cursor-pointer accent-[#18181B]">
+          <span class="text-xs font-black w-4 text-[#18181B]">${labels[optIdx]}:</span>
           <input type="text" value="${escapeHtml(val)}" onchange="updateOptionText(${idx}, ${optIdx}, this.value)" 
-                 class="w-full bg-slate-950 border ${colors[optIdx]} rounded px-2.5 py-1.5 text-xs text-white focus:outline-none">
+                 class="w-full bg-white border border-[#18181B] rounded px-2.5 py-1 text-xs text-[#18181B] font-bold focus:outline-none">
         </div>
       `;
     }).join('');
 
     qCard.innerHTML = `
       <div class="flex items-start justify-between gap-4 mb-3">
-        <span class="text-xs font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">
+        <span class="text-xs font-black text-[#B45309] bg-[#FEF3C7] px-2.5 py-0.5 rounded-full border border-[#18181B]">
           Câu ${idx + 1}
         </span>
-        <button onclick="deleteQuestion(${idx})" class="text-xs text-rose-400 hover:text-rose-300">
+        <button onclick="deleteQuestion(${idx})" class="text-xs text-[#E11D48] hover:underline font-black">
           ✕ Xóa câu này
         </button>
       </div>
 
       <div class="mb-3">
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Nội dung câu hỏi:</label>
+        <label class="block text-xs font-black text-[#18181B] mb-1">Nội dung câu hỏi:</label>
         <textarea rows="2" onchange="updateQuestionText(${idx}, this.value)" 
-                  class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm text-white focus:border-amber-400 focus:outline-none">${escapeHtml(q.question || '')}</textarea>
+                  class="w-full bg-white border-2 border-[#18181B] rounded-xl p-2.5 text-sm text-[#18181B] font-bold focus:outline-none shadow-[1px_1px_0px_#18181B]">${escapeHtml(q.question || '')}</textarea>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-2">

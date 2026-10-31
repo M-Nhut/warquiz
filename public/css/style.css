@@ -1,50 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Chakra+Petch:wght@600;700&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Chakra+Petch:wght@600;700;800&family=Share+Tech+Mono&display=swap');
 
 :root {
-  /* ================= CLAYMORPHISM + VIBRANT & BLOCK-BASED PALETTE ================= */
-  --bg-main: #0c1222;
-  --bg-clay: #162038;
-  --bg-clay-subtle: #1e2c4d;
-  --border-clay: rgba(255, 255, 255, 0.12);
+  /* ================= NEO-BRUTALISM PALETTE (Matching Reference) ================= */
+  --bg-page: #FAF8F5;          /* Warm soft cream background */
+  --bg-card: #FFFFFF;          /* Pure crisp white card */
+  --bg-card-subtle: #F4EFE6;
+  --ink-dark: #18181B;         /* Solid charcoal black for outlines and text */
+  --ink-muted: #52525B;
 
-  /* Vibrant Team Colors */
-  --human-clay: #0284c7;       /* Vibrant Sky/Cyan */
-  --human-shadow: #0369a1;
-  --human-light: #38bdf8;
-  --human-soft: #082f49;
+  /* Vibrant Team Accents */
+  --human-main: #0284C7;       /* Vibrant Sky Cyan */
+  --human-soft: #E0F2FE;
+  --human-light: #38BDF8;
+  --human-border: #0369A1;
 
-  --robot-clay: #e11d48;       /* Vibrant Crimson/Rose */
-  --robot-shadow: #9f1239;
-  --robot-light: #fb7185;
-  --robot-soft: #4c0519;
+  --robot-main: #E11D48;       /* Vibrant Rose / Coral */
+  --robot-soft: #FFE4E6;
+  --robot-light: #FB7185;
+  --robot-border: #BE123C;
 
-  /* Accent Vibrants */
-  --gold-clay: #f59e0b;
-  --gold-shadow: #b45309;
-  --gold-light: #fde68a;
+  /* Playful Accents from Reference */
+  --green-main: #22C55E;       /* Emerald CTA */
+  --green-soft: #DCFCE7;
+  --green-dark: #15803D;
 
-  --emerald-clay: #10b981;
-  --emerald-shadow: #047857;
-  --emerald-light: #6ee7b7;
+  --gold-main: #F59E0B;        /* Warm Gold */
+  --gold-soft: #FEF3C7;
+  --gold-dark: #B45309;
 
-  --text-primary: #ffffff;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
+  --purple-main: #8B5CF6;
+  --purple-soft: #EDE9FE;
 
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-tactical: 'Chakra Petch', sans-serif;
   --font-mono: 'Share Tech Mono', monospace;
 
-  /* Clay Shadows */
-  --clay-card-shadow: 
-    inset 1px 1px 2px rgba(255, 255, 255, 0.28),
-    inset -3px -3px 6px rgba(0, 0, 0, 0.45),
-    0 12px 24px -4px rgba(0, 0, 0, 0.4),
-    0 4px 8px -2px rgba(0, 0, 0, 0.3);
-
-  --clay-btn-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  /* Hard Unblurred Neo-Brutalist Shadows */
+  --neo-border: 2.5px solid var(--ink-dark);
+  --neo-border-thick: 3px solid var(--ink-dark);
+  --neo-shadow-card: 4px 5px 0px var(--ink-dark);
+  --neo-shadow-btn: 3px 4px 0px var(--ink-dark);
+  --neo-shadow-sm: 2px 2px 0px var(--ink-dark);
+  --neo-shadow-lg: 6px 8px 0px var(--ink-dark);
 }
 
 * {
@@ -56,13 +53,13 @@
 }
 
 body {
-  background-color: var(--bg-main);
-  color: var(--text-primary);
+  background-color: var(--bg-page);
+  color: var(--ink-dark);
   font-family: var(--font-sans);
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 /* ================= FULLSCREEN ARENA CONTAINER ================= */
@@ -84,366 +81,253 @@ body {
   display: block !important;
 }
 
-/* ================= CLAYMORPHIC BLOCK PANELS ================= */
-.clay-card, .taste-card {
-  background-color: var(--bg-clay);
+/* ================= NEO-BRUTALIST CARDS ================= */
+.taste-card, .clay-card, .cyber-panel {
+  background-color: var(--bg-card);
   border-radius: 20px;
-  border: 2px solid var(--border-clay);
-  box-shadow: var(--clay-card-shadow);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-card);
   position: relative;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  color: var(--ink-dark);
 }
 
-.clay-card:hover, .taste-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    inset 1px 1px 2px rgba(255, 255, 255, 0.35),
-    inset -3px -3px 6px rgba(0, 0, 0, 0.45),
-    0 16px 30px -4px rgba(0, 0, 0, 0.45);
+.taste-card:hover, .clay-card:hover, .cyber-panel:hover {
+  transform: translate(-1px, -2px);
+  box-shadow: 5px 7px 0px var(--ink-dark);
 }
 
-.clay-card-human, .taste-card-human {
-  background-color: #0d2138;
-  border: 2px solid var(--human-clay);
-  box-shadow: 
-    inset 1px 1px 2px rgba(56, 189, 248, 0.45),
-    inset -3px -3px 6px rgba(3, 105, 161, 0.5),
-    0 12px 24px -4px rgba(2, 132, 199, 0.3);
+/* Human Team Card */
+.taste-card-human, .clay-card-human {
+  background-color: var(--human-soft);
+  border: var(--neo-border);
+  box-shadow: 4px 5px 0px var(--ink-dark);
 }
 
-.clay-card-robot, .taste-card-robot {
-  background-color: #2b0e1d;
-  border: 2px solid var(--robot-clay);
-  box-shadow: 
-    inset 1px 1px 2px rgba(251, 113, 133, 0.45),
-    inset -3px -3px 6px rgba(159, 18, 57, 0.5),
-    0 12px 24px -4px rgba(225, 29, 72, 0.3);
+/* Robot Team Card */
+.taste-card-robot, .clay-card-robot {
+  background-color: var(--robot-soft);
+  border: var(--neo-border);
+  box-shadow: 4px 5px 0px var(--ink-dark);
 }
 
-/* ================= CLAYMORPHIC 3D TACTILE BUTTONS ================= */
-.btn-clay, .btn-cyber {
+/* ================= NEO-BRUTALIST CHUNKY BUTTONS ================= */
+.btn-cyber, .btn-clay {
   position: relative;
-  border-radius: 16px;
+  border-radius: 9999px;
   padding: 12px 24px;
-  font-family: var(--font-tactical);
+  font-family: var(--font-sans);
   font-weight: 800;
   font-size: 0.95rem;
-  letter-spacing: 0.5px;
-  color: #ffffff;
+  letter-spacing: -0.01em;
+  color: var(--ink-dark);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: none;
+  border: var(--neo-border);
   outline: none;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
-  background-color: var(--human-clay);
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 5px 0 var(--human-shadow),
-    0 8px 16px rgba(2, 132, 199, 0.35);
+  background-color: var(--bg-card);
+  box-shadow: var(--neo-shadow-btn);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
 }
 
-.btn-clay:hover, .btn-cyber:hover {
-  filter: brightness(1.08);
+.btn-cyber:hover, .btn-clay:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 5px 0px var(--ink-dark);
 }
 
-.btn-clay:active, .btn-cyber:active {
-  transform: translateY(4px);
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 1px 0 var(--human-shadow),
-    0 3px 6px rgba(2, 132, 199, 0.3);
+.btn-cyber:active, .btn-clay:active {
+  transform: translate(3px, 4px) !important;
+  box-shadow: 0px 0px 0px var(--ink-dark) !important;
 }
 
-/* Specific Clay Button Themes */
-.btn-start, .btn-clay-green {
-  background-color: var(--emerald-clay);
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 5px 0 var(--emerald-shadow),
-    0 8px 16px rgba(16, 185, 129, 0.35);
-}
-.btn-start:active, .btn-clay-green:active {
-  transform: translateY(4px);
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 1px 0 var(--emerald-shadow);
+/* Primary Green Button (like "Start Free" in reference image) */
+.btn-start, .btn-primary-green {
+  background-color: var(--green-main) !important;
+  color: #ffffff !important;
+  border: var(--neo-border) !important;
+  box-shadow: var(--neo-shadow-btn) !important;
 }
 
-.btn-clay-rose {
-  background-color: var(--robot-clay);
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 5px 0 var(--robot-shadow),
-    0 8px 16px rgba(225, 29, 72, 0.35);
-}
-.btn-clay-rose:active {
-  transform: translateY(4px);
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 1px 0 var(--robot-shadow);
+.btn-start:hover, .btn-primary-green:hover {
+  filter: brightness(1.05);
 }
 
-.btn-clay-gold {
-  background-color: var(--gold-clay);
-  color: #1a0f00;
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.45),
-    0 5px 0 var(--gold-shadow),
-    0 8px 16px rgba(245, 158, 11, 0.35);
-}
-.btn-clay-gold:active {
-  transform: translateY(4px);
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.45),
-    0 1px 0 var(--gold-shadow);
+.btn-start:active, .btn-primary-green:active {
+  transform: translate(3px, 4px) !important;
+  box-shadow: 0px 0px 0px var(--ink-dark) !important;
 }
 
-/* ================= CLAY TEAM SELECTION CARDS ================= */
+/* ================= TEAM SELECTION CARDS ================= */
 .team-select-card {
-  border-radius: 18px;
-  padding: 14px 10px;
-  background-color: #18223c;
-  border: 3px solid #283759;
-  box-shadow: 
-    inset 1px 1px 2px rgba(255, 255, 255, 0.2),
-    inset -2px -2px 4px rgba(0, 0, 0, 0.4),
-    0 6px 0 #111a2f;
+  border-radius: 16px;
+  padding: 12px 8px;
+  background-color: #ffffff;
+  border: var(--neo-border);
+  box-shadow: 3px 3px 0px var(--ink-dark);
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.1s ease;
   position: relative;
   text-align: center;
+  color: var(--ink-dark);
 }
 
 .team-select-card:hover {
-  transform: translateY(-2px);
-  border-color: #4b628f;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px var(--ink-dark);
 }
 
 .team-select-card:active {
-  transform: translateY(3px);
-  box-shadow: 
-    inset 1px 1px 2px rgba(255, 255, 255, 0.2),
-    inset -2px -2px 4px rgba(0, 0, 0, 0.4),
-    0 2px 0 #111a2f;
+  transform: translate(2px, 3px);
+  box-shadow: 0px 0px 0px var(--ink-dark);
 }
 
 .team-select-card.selected-human {
-  border-color: #38bdf8 !important;
-  background-color: #0b3252 !important;
-  box-shadow: 
-    inset 1px 1px 2px rgba(255, 255, 255, 0.4),
-    0 6px 0 #0369a1,
-    0 10px 20px rgba(2, 132, 199, 0.4) !important;
+  background-color: var(--human-soft) !important;
+  border-color: var(--ink-dark) !important;
+  box-shadow: 4px 4px 0px var(--human-main) !important;
 }
 
 .team-select-card.selected-robot {
-  border-color: #fb7185 !important;
-  background-color: #440d21 !important;
-  box-shadow: 
-    inset 1px 1px 2px rgba(255, 255, 255, 0.4),
-    0 6px 0 #9f1239,
-    0 10px 20px rgba(225, 29, 72, 0.4) !important;
+  background-color: var(--robot-soft) !important;
+  border-color: var(--ink-dark) !important;
+  box-shadow: 4px 4px 0px var(--robot-main) !important;
 }
 
 .team-select-card.selected-random {
-  border-color: #fbbf24 !important;
-  background-color: #3f2205 !important;
-  box-shadow: 
-    inset 1px 1px 2px rgba(255, 255, 255, 0.4),
-    0 6px 0 #b45309,
-    0 10px 20px rgba(245, 158, 11, 0.4) !important;
+  background-color: var(--gold-soft) !important;
+  border-color: var(--ink-dark) !important;
+  box-shadow: 4px 4px 0px var(--gold-main) !important;
 }
 
-/* ================= 4 CLAY BLOCK QUIZ BUTTONS ================= */
+/* ================= 4 NEO-BRUTALIST ANSWER BLOCKS ================= */
 .quiz-option {
   width: 100%;
-  padding: 16px 14px;
+  padding: 16px 16px;
   font-size: 1.05rem;
   font-weight: 800;
-  border-radius: 18px;
-  color: #ffffff;
+  border-radius: 16px;
+  color: var(--ink-dark);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 12px;
   text-align: left;
-  border: none;
+  border: var(--neo-border-thick);
   outline: none;
+  background-color: #ffffff;
+  box-shadow: var(--neo-shadow-btn);
   transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
   position: relative;
 }
 
+.quiz-option:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 5px 0px var(--ink-dark);
+}
+
 .quiz-option:active {
-  transform: translateY(5px) !important;
+  transform: translate(3px, 4px) !important;
+  box-shadow: 0px 0px 0px var(--ink-dark) !important;
 }
 
+/* 4 Distinct Pop Colors */
 .opt-a {
-  background-color: #e11d48;
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 6px 0 #9f1239,
-    0 10px 18px rgba(225, 29, 72, 0.35);
+  background-color: #FFE4E6;
+  color: #9F1239;
 }
-.opt-a:active {
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 1px 0 #9f1239;
-}
-
 .opt-b {
-  background-color: #2563eb;
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 6px 0 #1d4ed8,
-    0 10px 18px rgba(37, 99, 235, 0.35);
+  background-color: #E0F2FE;
+  color: #0369A1;
 }
-.opt-b:active {
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 1px 0 #1d4ed8;
-}
-
 .opt-c {
-  background-color: #d97706;
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 6px 0 #92400e,
-    0 10px 18px rgba(217, 119, 6, 0.35);
+  background-color: #FEF3C7;
+  color: #B45309;
 }
-.opt-c:active {
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 1px 0 #92400e;
-}
-
 .opt-d {
-  background-color: #059669;
-  box-shadow: 
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    0 6px 0 #047857,
-    0 10px 18px rgba(5, 150, 105, 0.35);
-}
-.opt-d:active {
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 1px 0 #047857;
+  background-color: #DCFCE7;
+  color: #15803D;
 }
 
 .opt-selected {
-  outline: 4px solid #ffffff !important;
-  filter: brightness(1.25);
+  outline: 4px solid var(--ink-dark) !important;
+  transform: translate(2px, 3px) !important;
+  box-shadow: 1px 1px 0px var(--ink-dark) !important;
 }
 
 .opt-correct {
-  filter: brightness(1.3);
-  box-shadow: 0 0 24px rgba(74, 222, 128, 0.8) !important;
+  background-color: #86EFAC !important;
+  color: #14532D !important;
+  box-shadow: 4px 5px 0px var(--ink-dark) !important;
 }
 
 .opt-wrong {
-  opacity: 0.35;
-  filter: grayscale(0.8);
+  opacity: 0.45;
+  filter: grayscale(0.6);
 }
 
-/* ================= CLAY PILL BADGES ================= */
+/* ================= PILL BADGES (Like "● New: AI-Powered Learning") ================= */
+.badge-pill-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--green-soft);
+  color: var(--green-dark);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-sm);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-weight: 800;
+  font-size: 11px;
+}
+
 .badge-human {
-  background-color: #0c2b48;
-  color: #38bdf8;
-  border: 2px solid #0284c7;
-  font-family: var(--font-tactical);
+  background-color: var(--human-soft);
+  color: var(--human-border);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-sm);
+  font-family: var(--font-sans);
   font-weight: 800;
   border-radius: 9999px;
-  box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 2px 6px rgba(0, 0, 0, 0.25);
+  padding: 4px 10px;
 }
 
 .badge-robot {
-  background-color: #380e1e;
-  color: #fb7185;
-  border: 2px solid #e11d48;
-  font-family: var(--font-tactical);
+  background-color: var(--robot-soft);
+  color: var(--robot-border);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-sm);
+  font-family: var(--font-sans);
   font-weight: 800;
   border-radius: 9999px;
-  box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 2px 6px rgba(0, 0, 0, 0.25);
+  padding: 4px 10px;
 }
 
-/* ================= CLAY HEALTH & OBJECTIVE BARS ================= */
+/* Floating Sticker Badges */
+.sticker-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--ink-dark);
+  box-shadow: 2px 3px 0px var(--ink-dark);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+/* ================= HEALTH & OBJECTIVE BARS ================= */
 .health-bar-container {
   width: 100%;
-  height: 18px;
-  background-color: #0f1629;
+  height: 16px;
+  background-color: #F4EFE6;
   border-radius: 9999px;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.6);
+  border: var(--neo-border);
+  box-shadow: 2px 2px 0px var(--ink-dark);
   overflow: hidden;
   position: relative;
-}
-
-.health-bar-fill {
-  height: 100%;
-  border-radius: 9999px;
-  transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
-}
-
-.health-human {
-  background-color: var(--human-clay);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 0 12px rgba(2, 132, 199, 0.6);
-}
-
-.health-robot {
-  background-color: var(--robot-clay);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 0 12px rgba(225, 29, 72, 0.6);
-}
-
-/* Timer */
-.timer-text {
-  font-family: var(--font-mono);
-  font-size: 2.25rem;
-  font-weight: 800;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.timer-warning {
-  color: #ef4444 !important;
-  animation: timer-blink 0.5s infinite alternate;
-}
-
-@keyframes timer-blink {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0.6; transform: scale(1.08); }
-}
-
-/* Sharp Pixel Rendering */
-.sprite-icon {
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-}
-
-/* Status Cards (Clay Block Style) */
-.tactical-status-card {
-  background-color: #141c32;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 8px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-tactical);
-  box-shadow: 
-    inset 1px 1px 2px rgba(255, 255, 255, 0.2),
-    inset -2px -2px 4px rgba(0, 0, 0, 0.35),
-    0 4px 10px rgba(0, 0, 0, 0.35);
-}
-
-/* ================= UI/UX PROMAX EXTENSIONS ================= */
-
-/* Fighting Game Ghost Health Bars */
-.health-bar-container {
-  position: relative;
-  background-color: #060a14;
-  border-radius: 9999px;
-  overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .health-bar-ghost {
@@ -452,8 +336,7 @@ body {
   bottom: 0;
   left: 0;
   border-radius: 9999px;
-  background-color: #f59e0b;
-  opacity: 0.85;
+  background-color: #FCD34D;
   transition: width 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
   z-index: 1;
 }
@@ -463,11 +346,49 @@ body {
   height: 100%;
   border-radius: 9999px;
   transition: width 0.25s ease-out;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
   z-index: 2;
 }
 
-/* Live Battle Ticker Feed (Host Screen) */
+.health-human {
+  background-color: var(--human-main);
+}
+
+.health-robot {
+  background-color: var(--robot-main);
+}
+
+/* Timer */
+.timer-text {
+  font-family: var(--font-mono);
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: var(--ink-dark);
+}
+
+.timer-warning {
+  color: #DC2626 !important;
+  animation: timer-blink 0.5s infinite alternate;
+}
+
+@keyframes timer-blink {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0.7; transform: scale(1.08); }
+}
+
+/* Tactical Status Cards in HUD */
+.tactical-status-card {
+  background-color: #FFFFFF;
+  border: var(--neo-border);
+  border-radius: 14px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--neo-shadow-sm);
+  color: var(--ink-dark);
+}
+
+/* Live Battle Feed Ticker */
 .battle-ticker {
   position: absolute;
   top: 14px;
@@ -487,29 +408,26 @@ body {
   gap: 8px;
   padding: 6px 12px;
   border-radius: 12px;
-  font-family: var(--font-tactical);
+  font-family: var(--font-sans);
   font-size: 11px;
-  font-weight: 700;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  font-weight: 800;
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-sm);
 }
 
 .ticker-human {
-  background: rgba(8, 47, 73, 0.9);
-  border: 1.5px solid var(--human-clay);
-  color: #38bdf8;
+  background: var(--human-soft);
+  color: var(--human-border);
 }
 
 .ticker-robot {
-  background: rgba(76, 5, 25, 0.9);
-  border: 1.5px solid var(--robot-clay);
-  color: #fb7185;
+  background: var(--robot-soft);
+  color: var(--robot-border);
 }
 
 .ticker-castle {
-  background: rgba(24, 18, 5, 0.9);
-  border: 1.5px solid var(--gold-clay);
-  color: #fde68a;
+  background: var(--gold-soft);
+  color: var(--gold-dark);
 }
 
 @keyframes feedSlideIn {
@@ -523,20 +441,21 @@ body {
   }
 }
 
-/* Toast Bubble Notification */
+/* Toast Bubble */
 .toast-bubble {
   position: fixed;
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%) translateY(30px);
-  background: #10b981;
+  background: var(--green-main);
   color: #ffffff;
   padding: 10px 22px;
   border-radius: 9999px;
+  border: var(--neo-border);
   font-family: var(--font-sans);
   font-weight: 800;
   font-size: 13px;
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: var(--neo-shadow-btn);
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -550,36 +469,43 @@ body {
 
 /* Sound Toggle Button */
 .btn-sound-toggle {
-  background: #1e293b;
-  border: 1.5px solid #334155;
-  border-radius: 12px;
-  padding: 6px 12px;
+  background: #FFFFFF;
+  border: var(--neo-border);
+  border-radius: 10px;
+  padding: 6px 10px;
   font-size: 12px;
-  font-weight: 700;
-  color: #cbd5e1;
+  font-weight: 800;
+  color: var(--ink-dark);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.15s ease;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 0px var(--ink-dark);
+  transition: all 0.1s ease;
 }
 
 .btn-sound-toggle:hover {
-  border-color: #38bdf8;
-  color: #ffffff;
-  transform: translateY(-1px);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px var(--ink-dark);
 }
 
 .btn-sound-toggle:active {
-  transform: translateY(2px);
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px var(--ink-dark);
+}
+
+/* Sharp Pixel Rendering */
+.sprite-icon {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 /* Mobile Holographic Target Crosshair Spinner */
 .target-scanner-ring {
-  width: 72px;
-  height: 72px;
-  border: 3px dashed var(--human-light);
+  width: 64px;
+  height: 64px;
+  border: 3px dashed var(--ink-dark);
   border-radius: 50%;
   animation: scanRotate 4s linear infinite;
   display: flex;
@@ -593,7 +519,7 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Touch Action & Reduced Motion Compliance */
+/* Touch Action & Reduced Motion */
 html, body {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
