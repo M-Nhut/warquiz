@@ -64,21 +64,22 @@ body {
 
 /* ================= FULLSCREEN ARENA CONTAINER ================= */
 #phaser-container {
-  width: 100% !important;
-  height: 100% !important;
-  flex: 1;
-  position: relative;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  background-color: #0c1222;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: #101827;
 }
 
 #phaser-container canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* ================= NEO-BRUTALIST CARDS ================= */

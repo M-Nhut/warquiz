@@ -372,10 +372,7 @@ function showBattle() {
     if (phaserGame && phaserGame.scale) {
       phaserGame.scale.refresh();
     }
-    if (battleScene && battleScene.isReady) {
-      battleScene.handleResize(battleScene.scale.width, battleScene.scale.height);
-    }
-  }, 120);
+  }, 100);
 }
 
 function showVictory(data) {
@@ -438,20 +435,20 @@ function initPhaserGame() {
   if (phaserGame) return;
 
   const container = document.getElementById('phaser-container');
-  const initialWidth = container && container.clientWidth ? container.clientWidth : window.innerWidth;
-  const initialHeight = container && container.clientHeight ? container.clientHeight : 500;
+  const initialWidth = container && container.clientWidth ? Math.floor(container.clientWidth) : window.innerWidth;
+  const initialHeight = container && container.clientHeight ? Math.floor(container.clientHeight) : 500;
 
   const config = {
     type: Phaser.AUTO,
     parent: 'phaser-container',
     width: initialWidth,
     height: initialHeight,
+    backgroundColor: '#101827',
     pixelArt: true,
     scale: {
       mode: Phaser.Scale.RESIZE,
       parent: 'phaser-container',
-      width: '100%',
-      height: '100%'
+      autoCenter: Phaser.Scale.CENTER_BOTH
     },
     physics: {
       default: 'arcade',
@@ -586,9 +583,15 @@ class TacticalArenaScene extends Phaser.Scene {
     this.createAnimations();
     this.buildTacticalMap();
 
-    // Listen for resize to keep arena edge-to-edge
+    this.cameras.main.setBackgroundColor('#101827');
+
+    // Debounce resize listener to prevent layout oscillation / feedback loops
+    let resizeTimer = null;
     this.scale.on('resize', (gameSize) => {
-      this.handleResize(gameSize.width, gameSize.height);
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        this.handleResize(Math.floor(gameSize.width), Math.floor(gameSize.height));
+      }, 50);
     });
 
     this.isReady = true;
@@ -596,6 +599,10 @@ class TacticalArenaScene extends Phaser.Scene {
   }
 
   handleResize(width, height) {
+    width = Math.floor(width);
+    height = Math.floor(height);
+    if (width <= 0 || height <= 0) return;
+
     const MAP_W = 1024;
     const MAP_H = 682;
     const mapAspect = MAP_W / MAP_H;
@@ -604,19 +611,19 @@ class TacticalArenaScene extends Phaser.Scene {
     let bgW, bgH;
     if (screenAspect > mapAspect) {
       bgH = height;
-      bgW = height * mapAspect;
+      bgW = Math.round(height * mapAspect);
     } else {
       bgW = width;
-      bgH = width / mapAspect;
+      bgH = Math.round(width / mapAspect);
     }
 
     this.mapDisplayW = bgW;
     this.mapDisplayH = bgH;
-    this.mapOriginX = (width - bgW) / 2;
-    this.mapOriginY = (height - bgH) / 2;
+    this.mapOriginX = Math.round((width - bgW) / 2);
+    this.mapOriginY = Math.round((height - bgH) / 2);
 
     if (this.mapBg) {
-      this.mapBg.setPosition(width / 2, height / 2);
+      this.mapBg.setPosition(Math.round(width / 2), Math.round(height / 2));
       this.mapBg.setDisplaySize(bgW, bgH);
     }
 
@@ -678,7 +685,7 @@ class TacticalArenaScene extends Phaser.Scene {
       });
     });
 
-    ['Spider', 'Scarab', 'Centipede', 'Wasp'].forEach(key => {
+    ['Spider', 'Scarab', 'Centipede'].forEach(key => {
       this.anims.create({
         key: `${key}-idle`,
         frames: this.anims.generateFrameNumbers(key, { start: 0, end: 4 }),
@@ -699,7 +706,27 @@ class TacticalArenaScene extends Phaser.Scene {
       });
     });
 
-    // Hornet
+    // Wasp (1 row of 8 frames: 0-7)
+    this.anims.create({
+      key: 'Wasp-idle',
+      frames: this.anims.generateFrameNumbers('Wasp', { start: 0, end: 3 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'Wasp-fire',
+      frames: this.anims.generateFrameNumbers('Wasp', { start: 4, end: 7 }),
+      frameRate: 12,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'Wasp-hit',
+      frames: this.anims.generateFrameNumbers('Wasp', { start: 4, end: 7 }),
+      frameRate: 10,
+      repeat: 0
+    });
+
+    // Hornet (2 rows of 8 frames: 0-15)
     this.anims.create({
       key: 'Hornet-idle',
       frames: this.anims.generateFrameNumbers('Hornet', { start: 0, end: 7 }),
@@ -710,6 +737,12 @@ class TacticalArenaScene extends Phaser.Scene {
       key: 'Hornet-fire',
       frames: this.anims.generateFrameNumbers('Hornet', { start: 8, end: 15 }),
       frameRate: 14,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'Hornet-hit',
+      frames: this.anims.generateFrameNumbers('Hornet', { start: 8, end: 15 }),
+      frameRate: 12,
       repeat: 0
     });
 
@@ -792,20 +825,21 @@ class TacticalArenaScene extends Phaser.Scene {
     // Contain mode: entire map is 100% visible from left base to right base
     if (screenAspect > mapAspect) {
       bgH = h;
-      bgW = h * mapAspect;
+      bgW = Math.round(h * mapAspect);
     } else {
       bgW = w;
-      bgH = w / mapAspect;
+      bgH = Math.round(w / mapAspect);
     }
 
     this.mapDisplayW = bgW;
     this.mapDisplayH = bgH;
-    this.mapOriginX = (w - bgW) / 2;
-    this.mapOriginY = (h - bgH) / 2;
+    this.mapOriginX = Math.round((w - bgW) / 2);
+    this.mapOriginY = Math.round((h - bgH) / 2);
 
     // 1. Kingdom Arena Panoramic Background
-    this.mapBg = this.add.image(w / 2, h / 2, 'map_kingdom');
+    this.mapBg = this.add.image(Math.round(w / 2), Math.round(h / 2), 'map_kingdom');
     this.mapBg.setDisplaySize(bgW, bgH);
+    this.mapBg.setDepth(-10);
 
     // 2. Central Castle Objective Beacon (Entrance at ref 470, 405)
     const objX = this.mapX(470);
@@ -816,10 +850,12 @@ class TacticalArenaScene extends Phaser.Scene {
     this.objectivePulse.setScale(beaconScale);
     this.objectivePulse.play('anim-pulse');
     this.objectivePulse.setTint(0xffd600); // Yellow neutral pulse
+    this.objectivePulse.setDepth(1);
 
     this.objectiveFlag = this.add.sprite(objX, this.mapY(360), 'objective_flag');
     this.objectiveFlag.setScale(beaconScale * 0.85);
     this.objectiveFlag.play('anim-flag');
+    this.objectiveFlag.setDepth(2);
 
     this.objectiveText = this.add.text(objX, this.mapY(305), 'LÂU ĐÀI TRUNG TÂM', {
       fontFamily: 'Plus Jakarta Sans',
@@ -829,6 +865,7 @@ class TacticalArenaScene extends Phaser.Scene {
       backgroundColor: '#FEF3C7',
       padding: { x: 8, y: 3 }
     }).setOrigin(0.5);
+    this.objectiveText.setDepth(3);
 
     // Full overview camera
     this.applyCombatCamera(false);

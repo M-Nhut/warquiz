@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Host Arena | RobotWar: Quiz Arena</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=2.2">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/lib/phaser.min.js"></script>
@@ -227,11 +227,9 @@
       
       <!-- LEFT: TOÀN CẢNH MAP (FULL BATTLEFIELD ARENA) -->
       <section class="flex-1 lg:flex-[58] xl:flex-[60] h-full relative rounded-2xl border-[2.5px] border-[#18181B] shadow-[4px_5px_0px_#18181B] overflow-hidden bg-[#101827]">
-        <div id="phaser-container" class="w-full h-full relative flex items-center justify-center">
-          <!-- Live Battle Feed Ticker -->
-          <div id="battle-ticker" class="battle-ticker"></div>
-          <!-- Phaser Canvas renders here -->
-        </div>
+        <div id="phaser-container" class="absolute inset-0 w-full h-full overflow-hidden"></div>
+        <!-- Live Battle Feed Ticker Overlay -->
+        <div id="battle-ticker" class="battle-ticker"></div>
       </section>
 
       <!-- RIGHT: CÂU HỎI VÀ ĐÁP ÁN BỰ HƠN 1 BÊN -->
@@ -332,6 +330,6 @@
   <!-- Toast Notification Bubble -->
   <div id="toast-bubble" class="toast-bubble"></div>
 
-  <script src="/js/host.js"></script>
+  <script src="/js/host.js?v=2.2"></script>
 </body>
 </html>
