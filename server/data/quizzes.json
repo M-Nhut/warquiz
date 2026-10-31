@@ -1,0 +1,266 @@
+[
+  {
+    "id": "quiz-robotwar",
+    "title": "Chiến Tranh Robot & Công Nghệ Tương Lai",
+    "description": "Thử thách kiến thức về AI, người máy, công nghệ viễn tưởng và kỹ thuật số.",
+    "timePerQuestion": 15,
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Thuật ngữ 'Robot' lần đầu tiên xuất hiện trong tác phẩm kịch nào vào năm 1920?",
+        "options": [
+          "R.U.R. (Rossum's Universal Robots)",
+          "I, Robot của Isaac Asimov",
+          "Kẻ Hủy Diệt (The Terminator)",
+          "Frankenstein của Mary Shelley"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "q2",
+        "question": "Ba định luật về người máy nổi tiếng được nhà văn viễn tưởng nào đặt ra?",
+        "options": [
+          "Arthur C. Clarke",
+          "Philip K. Dick",
+          "Isaac Asimov",
+          "H.G. Wells"
+        ],
+        "correctIndex": 2,
+        "difficulty": 1
+      },
+      {
+        "id": "q3",
+        "question": "Công nghệ nào cho phép robot tự định vị và vẽ bản đồ môi trường xung quanh trong thời gian thực?",
+        "options": [
+          "GPS",
+          "SLAM (Simultaneous Localization and Mapping)",
+          "Bluetooth Mesh",
+          "NFC"
+        ],
+        "correctIndex": 1,
+        "difficulty": 2
+      },
+      {
+        "id": "q4",
+        "question": "Trong AI, mạng nơ-ron nào thường được sử dụng phổ biến nhất để xử lý hình ảnh và thị giác máy tính?",
+        "options": [
+          "CNN (Convolutional Neural Network)",
+          "RNN (Recurrent Neural Network)",
+          "LSTM",
+          "Markov Chain"
+        ],
+        "correctIndex": 0,
+        "difficulty": 2
+      },
+      {
+        "id": "q5",
+        "question": "Robot hình người nổi tiếng do công ty Boston Dynamics phát triển có tên là gì?",
+        "options": [
+          "Optimus",
+          "Asimo",
+          "Atlas",
+          "Sophia"
+        ],
+        "correctIndex": 2,
+        "difficulty": 1
+      },
+      {
+        "id": "q6",
+        "question": "Cảm biến LiDAR sử dụng loại sóng/bức xạ nào để đo khoảng cách và tạo mô hình 3D?",
+        "options": [
+          "Sóng siêu âm",
+          "Sóng radio",
+          "Tia laser (Ánh sáng)",
+          "Tia X"
+        ],
+        "correctIndex": 2,
+        "difficulty": 2
+      },
+      {
+        "id": "q7",
+        "question": "Hệ điều hành mã nguồn mở phổ biến nhất được các kỹ sư robot trên toàn thế giới sử dụng là gì?",
+        "options": [
+          "ROS (Robot Operating System)",
+          "Android Auto",
+          "FreeRTOS",
+          "Symbian OS"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "q8",
+        "question": "Khái niệm 'Uncanny Valley' (Thung lũng kỳ lạ) trong chế tạo robot dùng để chỉ hiện tượng gì?",
+        "options": [
+          "Khu vực thử nghiệm robot bí mật",
+          "Cảm giác ghê sợ của con người khi robot quá giống người nhưng chưa hoàn hảo",
+          "Mức tiêu hao năng lượng cực đại của robot",
+          "Khoảng cách truyền tín hiệu tối đa giữa các robot"
+        ],
+        "correctIndex": 1,
+        "difficulty": 2
+      },
+      {
+        "id": "q9",
+        "question": "Động cơ nào thường được dùng trong các khớp xoay của robot đòi hỏi độ chính xác góc quay cao?",
+        "options": [
+          "Động cơ Servo / Bước (Stepper Motor)",
+          "Động cơ hơi nước",
+          "Động cơ xăng 2 kỳ",
+          "Động cơ phản lực"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "q10",
+        "question": "Thuật toán A* (A Star) thường được ứng dụng vào chức năng nào trong hệ thống tự hành của robot?",
+        "options": [
+          "Mã hóa dữ liệu giọng nói",
+          "Tìm đường đi ngắn nhất (Pathfinding)",
+          "Phân loại màu sắc ảnh",
+          "Kiểm tra nhiệt độ pin"
+        ],
+        "correctIndex": 1,
+        "difficulty": 2
+      }
+    ]
+  },
+  {
+    "id": "quiz-science",
+    "title": "Khoa Học Tự Nhiên & Vũ Trụ",
+    "description": "Khám phá các bí ẩn của vũ trụ, vật lý và thế giới tự nhiên.",
+    "timePerQuestion": 15,
+    "questions": [
+      {
+        "id": "s1",
+        "question": "Hành tinh nào có kích thước lớn nhất trong Hệ Mặt Trời của chúng ta?",
+        "options": [
+          "Sao Thổ",
+          "Sao Mộc (Jupiter)",
+          "Sao Hải Vương",
+          "Sao Hỏa"
+        ],
+        "correctIndex": 1,
+        "difficulty": 1
+      },
+      {
+        "id": "s2",
+        "question": "Vận tốc ánh sáng trong chân không xấp xỉ bao nhiêu km/giây?",
+        "options": [
+          "150.000 km/s",
+          "300.000 km/s",
+          "1.000.000 km/s",
+          "30.000 km/s"
+        ],
+        "correctIndex": 1,
+        "difficulty": 1
+      },
+      {
+        "id": "s3",
+        "question": "Nguyên tố hóa học nào dồi dào nhất trong toàn vũ trụ?",
+        "options": [
+          "Oxy (O)",
+          "Heli (He)",
+          "Hydro (H)",
+          "Carbon (C)"
+        ],
+        "correctIndex": 2,
+        "difficulty": 2
+      },
+      {
+        "id": "s4",
+        "question": "Định luật bảo toàn nào khẳng định 'Năng lượng không tự nhiên sinh ra cũng không tự nhiên mất đi'?",
+        "options": [
+          "Định luật I Nhiệt động lực học",
+          "Định luật Vạn vật hấp dẫn",
+          "Định luật Ohm",
+          "Định luật Bernoulli"
+        ],
+        "correctIndex": 0,
+        "difficulty": 2
+      },
+      {
+        "id": "s5",
+        "question": "Trọng lực trên bề mặt Mặt Trăng bằng khoảng bao nhiêu phần so với Trái Đất?",
+        "options": [
+          "Khoảng 1/2",
+          "Khoảng 1/6",
+          "Khoảng 1/10",
+          "Khoảng 1/3"
+        ],
+        "correctIndex": 1,
+        "difficulty": 1
+      }
+    ]
+  },
+  {
+    "id": "quiz-tactics",
+    "title": "Đố Vui Phản Xạ & Chiến Thuật",
+    "description": "Các câu đố mẹo, phản xạ nhanh rèn luyện tư duy đồng đội.",
+    "timePerQuestion": 10,
+    "questions": [
+      {
+        "id": "t1",
+        "question": "Nếu bạn vượt qua người đang chạy ở vị trí thứ nhì, bạn đang đứng ở vị trí thứ mấy?",
+        "options": [
+          "Thứ nhất",
+          "Thứ nhì",
+          "Thứ ba",
+          "Chưa xác định"
+        ],
+        "correctIndex": 1,
+        "difficulty": 1
+      },
+      {
+        "id": "t2",
+        "question": "Một người thợ săn đi 1 dặm về phía Nam, 1 dặm về phía Đông, rồi 1 dặm về phía Bắc và quay lại điểm xuất phát. Con gấu anh ta thấy màu gì?",
+        "options": [
+          "Màu nâu",
+          "Màu đen",
+          "Màu trắng (Điểm cực Bắc)",
+          "Màu xám"
+        ],
+        "correctIndex": 2,
+        "difficulty": 2
+      },
+      {
+        "id": "t3",
+        "question": "Có 10 con chim đậu trên cành cây, người thợ săn bắn rơi 1 con. Hỏi trên cành còn lại bao nhiêu con?",
+        "options": [
+          "9 con",
+          "Không còn con nào (Đã bay hết vì tiếng súng)",
+          "8 con",
+          "1 con"
+        ],
+        "correctIndex": 1,
+        "difficulty": 1
+      },
+      {
+        "id": "t4",
+        "question": "Cái gì thuộc về bạn, nhưng người khác lại dùng nó nhiều hơn cả bạn?",
+        "options": [
+          "Tiền bạc của bạn",
+          "Tên gọi của bạn",
+          "Điện thoại của bạn",
+          "Mật khẩu của bạn"
+        ],
+        "correctIndex": 1,
+        "difficulty": 1
+      },
+      {
+        "id": "t5",
+        "question": "Bàn cờ vua tiêu chuẩn quốc tế có tổng cộng bao nhiêu ô vuông?",
+        "options": [
+          "64 ô",
+          "32 ô",
+          "72 ô",
+          "100 ô"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      }
+    ]
+  }
+]
