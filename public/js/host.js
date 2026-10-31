@@ -158,7 +158,8 @@ function createNewRoom() {
   socket.emit('host_create_room', {
     quizId,
     timePerQuestion,
-    baseHp: 1000
+    baseHp: 1000,
+    baseUrl: window.location.origin
   }, (res) => {
     if (res && res.success) {
       currentRoomId = res.roomId;

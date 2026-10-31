@@ -137,11 +137,21 @@ io.on('connection', (socket) => {
       const winCondition = data.winCondition || 'both'; // 'both' | 'base_hp' | 'questions_end'
 
       const localIp = getLocalIpAddress();
-      const joinUrl = `http://${localIp}:${PORT}/join?room=${roomId}`;
+      let baseUrl = data.baseUrl;
+      if (!baseUrl) {
+        const forwardedProto = socket.handshake.headers['x-forwarded-proto'] || 'http';
+        const hostHeader = socket.handshake.headers.host;
+        if (hostHeader && !hostHeader.includes('localhost') && !hostHeader.includes('127.0.0.1')) {
+          baseUrl = `${forwardedProto}://${hostHeader}`;
+        } else {
+          baseUrl = `http://${localIp}:${PORT}`;
+        }
+      }
+      const joinUrl = `${baseUrl}/join?room=${roomId}`;
       const qrCodeDataUrl = await QRCode.toDataURL(joinUrl, {
         width: 320,
         margin: 2,
-        color: { dark: '#00e5ff', light: '#0a0e17' }
+        color: { dark: '#18181B', light: '#FFFFFF' }
       });
 
       rooms[roomId] = {
