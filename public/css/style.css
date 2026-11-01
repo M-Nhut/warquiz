@@ -206,50 +206,85 @@ body {
 /* ================= 4 NEO-BRUTALIST ANSWER BLOCKS ================= */
 .quiz-option {
   width: 100%;
-  padding: 16px 16px;
-  font-size: 1.05rem;
+  flex: 1;
+  min-height: 64px;
+  padding: 10px 16px;
+  font-size: 1.1rem;
   font-weight: 800;
-  border-radius: 16px;
+  border-radius: 18px;
   color: var(--ink-dark);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   text-align: left;
-  border: var(--neo-border-thick);
+  border: 2.5px solid var(--ink-dark);
   outline: none;
   background-color: #ffffff;
-  box-shadow: var(--neo-shadow-btn);
+  box-shadow: 3px 3px 0px var(--ink-dark);
   transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
   position: relative;
 }
 
 .quiz-option:hover {
   transform: translate(-1px, -1px);
-  box-shadow: 4px 5px 0px var(--ink-dark);
+  box-shadow: 4px 4px 0px var(--ink-dark);
 }
 
 .quiz-option:active {
-  transform: translate(3px, 4px) !important;
+  transform: translate(2px, 2px) !important;
   box-shadow: 0px 0px 0px var(--ink-dark) !important;
 }
 
 /* 4 Distinct Pop Colors */
 .opt-a {
   background-color: #FFE4E6;
-  color: #9F1239;
 }
 .opt-b {
   background-color: #E0F2FE;
-  color: #0369A1;
 }
 .opt-c {
   background-color: #FEF3C7;
-  color: #B45309;
 }
 .opt-d {
   background-color: #DCFCE7;
-  color: #15803D;
+}
+
+/* Shape/Icon Badge inside Answer Option */
+.opt-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  border: 2px solid var(--ink-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 900;
+  box-shadow: 2px 2px 0px var(--ink-dark);
+  flex-shrink: 0;
+}
+
+.opt-badge-a { color: #BE123C; }
+.opt-badge-b { color: #0284C7; }
+.opt-badge-c { color: #B45309; }
+.opt-badge-d { color: #15803D; }
+
+/* Text & LaTeX math formula inside Answer Option */
+.opt-content {
+  flex: 1;
+  min-width: 0;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--ink-dark);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.quiz-option .katex {
+  font-size: 1.15em;
+  color: var(--ink-dark);
 }
 
 .opt-selected {
@@ -261,12 +296,12 @@ body {
 .opt-correct {
   background-color: #86EFAC !important;
   color: #14532D !important;
-  box-shadow: 4px 5px 0px var(--ink-dark) !important;
+  box-shadow: 4px 4px 0px var(--ink-dark) !important;
 }
 
 .opt-wrong {
-  opacity: 0.45;
-  filter: grayscale(0.6);
+  opacity: 0.35;
+  filter: grayscale(0.7);
 }
 
 /* ================= PILL BADGES (Like "● New: AI-Powered Learning") ================= */
@@ -378,14 +413,13 @@ body {
 
 /* Tactical Status Cards in HUD */
 .tactical-status-card {
-  background-color: #FFFFFF;
-  border: var(--neo-border);
+  border: 2px solid var(--ink-dark);
   border-radius: 14px;
   padding: 6px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: var(--neo-shadow-sm);
+  box-shadow: 2.5px 2.5px 0px var(--ink-dark);
   color: var(--ink-dark);
 }
 
@@ -468,26 +502,29 @@ body {
   transform: translateX(-50%) translateY(0);
 }
 
-/* Sound Toggle Button */
+/* Sound & Toolbar Toggle Buttons */
 .btn-sound-toggle {
   background: #FFFFFF;
-  border: var(--neo-border);
-  border-radius: 10px;
-  padding: 6px 10px;
+  border: 2px solid var(--ink-dark);
+  border-radius: 12px;
+  padding: 6px 12px;
   font-size: 12px;
   font-weight: 800;
   color: var(--ink-dark);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   box-shadow: 2px 2px 0px var(--ink-dark);
   transition: all 0.1s ease;
+  height: 38px;
 }
 
 .btn-sound-toggle:hover {
   transform: translate(-1px, -1px);
   box-shadow: 3px 3px 0px var(--ink-dark);
+  background-color: #FAF8F5;
 }
 
 .btn-sound-toggle:active {
