@@ -446,6 +446,28 @@ io.on('connection', (socket) => {
     if (callback) callback({ success: true });
   });
 
+  // HOST: End Game Early (Stop Battle Prematurely)
+  socket.on('host_end_game', (data = {}, callback) => {
+    let roomId = data.roomId;
+    if (!roomId) {
+      const foundRoom = Object.values(rooms).find(r => r.hostSocketId === socket.id);
+      if (foundRoom) roomId = foundRoom.id;
+    }
+    const room = rooms[roomId];
+    if (!room) return;
+    if (room.status === 'game_over' || room.status === 'lobby') return;
+
+    if (room.questionTimer) {
+      clearInterval(room.questionTimer);
+      room.questionTimer = null;
+    }
+
+    const reason = data.reason || 'Trận chiến đã kết thúc sớm theo yêu cầu của Quản trò (Host)!';
+    triggerGameOver(roomId, reason, true);
+
+    if (callback) callback({ success: true });
+  });
+
   // Send a Question to Room
   function sendQuestion(roomId, qIndex) {
     const room = rooms[roomId];
@@ -704,12 +726,16 @@ io.on('connection', (socket) => {
   }
 
   // Trigger Game Over
-  function triggerGameOver(roomId, reason) {
+  function triggerGameOver(roomId, reason, isEarly = false) {
     const room = rooms[roomId];
     if (!room) return;
+    if (room.status === 'game_over' && !isEarly) return;
 
     room.status = 'game_over';
-    if (room.questionTimer) clearInterval(room.questionTimer);
+    if (room.questionTimer) {
+      clearInterval(room.questionTimer);
+      room.questionTimer = null;
+    }
 
     let winnerTeam = 'draw';
     if (room.teams.human.hp > room.teams.robot.hp) {
@@ -738,6 +764,7 @@ io.on('connection', (socket) => {
       winnerTeam,
       reason,
       mvpList,
+      isEarlyEnd: isEarly,
       teams: {
         human: { name: room.teams.human.name, hp: room.teams.human.hp, maxHp: room.teams.human.maxHp, score: room.teams.human.score },
         robot: { name: room.teams.robot.name, hp: room.teams.robot.hp, maxHp: room.teams.robot.maxHp, score: room.teams.robot.score }

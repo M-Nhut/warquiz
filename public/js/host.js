@@ -37,6 +37,7 @@ const btnSoundLobby = document.getElementById('btn-sound-lobby');
 const btnSoundBattle = document.getElementById('btn-sound-battle');
 const soundIconLobby = document.getElementById('sound-icon-lobby');
 const soundIconBattle = document.getElementById('sound-icon-battle');
+const btnEndBattle = document.getElementById('btn-end-battle');
 
 const battleQuestionText = document.getElementById('battle-question-text');
 const bOptTexts = [
@@ -193,6 +194,20 @@ btnBackToLobby.onclick = () => {
     showLobby();
   });
 };
+
+if (btnEndBattle) {
+  btnEndBattle.onclick = () => {
+    if (!currentRoomId) return;
+    if (window.soundFX) window.soundFX.playClick();
+    const confirmed = confirm('🛑 BẠN CÓ CHẮC CHẮN MUỐN KẾT THÚC TRẬN ĐẤU SỚM?\n\nTrận chiến sẽ dừng ngay lập tức. Kết quả thắng/thua và danh sách MVP sẽ được tổng kết dựa trên lượng máu căn cứ và điểm số hiện tại của 2 phe.');
+    if (!confirmed) return;
+
+    socket.emit('host_end_game', {
+      roomId: currentRoomId,
+      reason: 'Trận chiến kết thúc sớm theo quyết định của Quản trò (Host)!'
+    });
+  };
+}
 
 // ================= SOCKET EVENT LISTENERS =================
 socket.on('roster_updated', (data) => {
@@ -359,9 +374,10 @@ function updateObjectiveHud(obj) {
 }
 
 socket.on('game_over', (data) => {
+  const delay = data && data.isEarlyEnd ? 400 : 3500;
   setTimeout(() => {
     showVictory(data);
-  }, 4000);
+  }, delay);
 });
 
 function showLobby() {
