@@ -406,6 +406,9 @@ function showVictory(data) {
 
   if (battleScene && battleScene.isReady) {
     battleScene.applyFullOverviewCamera(true);
+    if (battleScene.celebrateVictory) {
+      battleScene.celebrateVictory(data.winnerTeam);
+    }
   }
 
   if (window.soundFX) window.soundFX.playVictory();
@@ -484,6 +487,57 @@ function initPhaserGame() {
   phaserGame = new Phaser.Game(config);
 }
 
+// High-precision Catmull-Rom spline curves matching the Kingdom map dirt roads
+const LANE_1_POINTS = [
+  { x: 0, y: 430 },
+  { x: 50, y: 400 },
+  { x: 120, y: 390 },
+  { x: 190, y: 390 },
+  { x: 220, y: 440 },
+  { x: 280, y: 520 },
+  { x: 380, y: 535 },
+  { x: 465, y: 485 }, // Castle entrance gate (t = 0.5)
+  { x: 540, y: 440 },
+  { x: 610, y: 390 },
+  { x: 700, y: 340 },
+  { x: 730, y: 280 },
+  { x: 810, y: 260 },
+  { x: 920, y: 260 },
+  { x: 1024, y: 260 }
+];
+
+const LANE_2_POINTS = [
+  { x: 40, y: 680 },
+  { x: 110, y: 650 },
+  { x: 160, y: 600 },
+  { x: 185, y: 540 },
+  { x: 240, y: 530 },
+  { x: 350, y: 540 },
+  { x: 465, y: 510 }, // Courtyard South (t = 0.5)
+  { x: 560, y: 530 },
+  { x: 640, y: 550 },
+  { x: 730, y: 540 },
+  { x: 830, y: 540 },
+  { x: 920, y: 560 },
+  { x: 1024, y: 580 }
+];
+
+function getSplinePos(pts, t) {
+  t = Math.max(0.0, Math.min(1.0, t));
+  const n = pts.length - 1;
+  const i = Math.min(Math.floor(t * n), n - 1);
+  const localT = (t * n) - i;
+  const p0 = pts[Math.max(0, i - 1)];
+  const p1 = pts[i];
+  const p2 = pts[Math.min(n, i + 1)];
+  const p3 = pts[Math.min(n, i + 2)];
+  const t2 = localT * localT;
+  const t3 = t2 * localT;
+  const x = 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * localT + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3);
+  const y = 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * localT + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3);
+  return { x, y };
+}
+
 class TacticalArenaScene extends Phaser.Scene {
   constructor() {
     super('TacticalArenaScene');
@@ -514,7 +568,6 @@ class TacticalArenaScene extends Phaser.Scene {
   }
 
   applyCombatCamera(animate = false) {
-    // Full panoramic overview camera - shows the entire map from left base to right base
     const w = this.scale.width;
     const h = this.scale.height;
     const targetX = w / 2;
@@ -548,24 +601,6 @@ class TacticalArenaScene extends Phaser.Scene {
     // Kingdom Arena Map Background (User Fantasy Map)
     this.load.image('map_kingdom', '/assets/map/kingdom_arena_map.png');
 
-    // Sliced 32x32 Tiles & Obstacles (Cyber Map)
-    this.load.image('map_courtyard', '/assets/map/courtyard_clean.png');
-    this.load.image('map_courtyard_var', '/assets/map/courtyard_variation.png');
-    this.load.image('map_terrain_dark', '/assets/map/terrain_dark.png');
-    this.load.image('map_terrain_rubble', '/assets/map/terrain_rubble.png');
-    this.load.image('map_wall_h', '/assets/map/wall_straight_h.png');
-    this.load.image('map_wall_gate', '/assets/map/wall_gate.png');
-    this.load.image('map_road_v', '/assets/map/road_vertical_complete.png');
-    this.load.image('map_road_h', '/assets/map/road_horizontal_complete.png');
-    this.load.image('map_road_turn_tr', '/assets/map/road_turn_top_right_complete.png');
-    this.load.image('map_road_turn_ld', '/assets/map/road_turn_left_down_complete.png');
-    this.load.image('map_streetlight', '/assets/map/streetlight.png');
-    this.load.image('map_glow', '/assets/map/streetlight_glow.png');
-    this.load.image('map_car_red', '/assets/map/car_red.png');
-    this.load.image('map_car_blue', '/assets/map/car_blue.png');
-    this.load.image('map_boulders', '/assets/map/boulders.png');
-    this.load.image('map_barrier', '/assets/map/barrier.png');
-
     // Soldiers (16x16 frames)
     const soldiers = [
       'Assault-Class', 'Sniper-Class', 'MachineGunner-Class',
@@ -596,11 +631,10 @@ class TacticalArenaScene extends Phaser.Scene {
     this.load.spritesheet('smoke', '/robotwar/Effects/smoke.png', { frameWidth: 8, frameHeight: 8 });
     this.load.spritesheet('fragments', '/robotwar/Effects/big-fragments.png', { frameWidth: 32, frameHeight: 32 });
 
-    // Objective & UI Assets (Reference Video)
+    // Objective & UI Assets
     this.load.spritesheet('objective_flag', '/robotwar/UI/objective-flag.png', { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet('objective_pulse', '/robotwar/UI/objective-pulse.png', { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet('target_cursor', '/robotwar/UI/target-cursor.png', { frameWidth: 8, frameHeight: 8 });
-    this.load.spritesheet('range_grid', '/robotwar/UI/range-grid.png', { frameWidth: 16, frameHeight: 16 });
   }
 
   create() {
@@ -609,7 +643,6 @@ class TacticalArenaScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor('#101827');
 
-    // Debounce resize listener to prevent layout oscillation / feedback loops
     let resizeTimer = null;
     this.scale.on('resize', (gameSize) => {
       if (resizeTimer) clearTimeout(resizeTimer);
@@ -651,8 +684,8 @@ class TacticalArenaScene extends Phaser.Scene {
       this.mapBg.setDisplaySize(bgW, bgH);
     }
 
-    const objX = this.mapX(470);
-    const objY = this.mapY(405);
+    const objX = this.mapX(465);
+    const objY = this.mapY(495);
     const beaconScale = Math.max(0.9, 1.2 * (bgH / 682));
 
     if (this.objectivePulse) {
@@ -660,24 +693,17 @@ class TacticalArenaScene extends Phaser.Scene {
       this.objectivePulse.setScale(beaconScale);
     }
     if (this.objectiveFlag) {
-      this.objectiveFlag.setPosition(objX, this.mapY(360));
+      this.objectiveFlag.setPosition(objX, this.mapY(440));
       this.objectiveFlag.setScale(beaconScale * 0.85);
     }
     if (this.objectiveText) {
-      this.objectiveText.setPosition(objX, this.mapY(305));
+      this.objectiveText.setPosition(objX, this.mapY(385));
       this.objectiveText.setFontSize(`${Math.round(Math.max(10, 12 * (bgW / 1024)))}px`);
     }
 
     // Reposition all active unit sprites
-    const uScale = this.getUnitScale();
     Object.values(this.unitSprites).forEach(u => {
-      if (u.refX !== undefined && u.refY !== undefined) {
-        const nx = this.mapX(u.refX);
-        const ny = this.mapY(u.refY);
-        u.sprite.setPosition(nx, ny);
-        u.sprite.setScale(uScale);
-        u.label.setPosition(nx, ny - (20 * (uScale / 1.8)));
-      }
+      this.updateUnitScreenPos(u);
     });
 
     this.applyCombatCamera(false);
@@ -695,6 +721,13 @@ class TacticalArenaScene extends Phaser.Scene {
         frameRate: 6,
         repeat: -1
       });
+      // Walk / Marching animation
+      this.anims.create({
+        key: `${key}-walk`,
+        frames: this.anims.generateFrameNumbers(key, { start: 5, end: 9 }),
+        frameRate: 10,
+        repeat: -1
+      });
       this.anims.create({
         key: `${key}-fire`,
         frames: this.anims.generateFrameNumbers(key, { start: 15, end: 19 }),
@@ -709,11 +742,17 @@ class TacticalArenaScene extends Phaser.Scene {
       });
     });
 
-    ['Spider', 'Scarab', 'Centipede'].forEach(key => {
+    ['Spider', 'Scarab'].forEach(key => {
       this.anims.create({
         key: `${key}-idle`,
         frames: this.anims.generateFrameNumbers(key, { start: 0, end: 4 }),
         frameRate: 6,
+        repeat: -1
+      });
+      this.anims.create({
+        key: `${key}-walk`,
+        frames: this.anims.generateFrameNumbers(key, { start: 5, end: 9 }),
+        frameRate: 10,
         repeat: -1
       });
       this.anims.create({
@@ -730,11 +769,43 @@ class TacticalArenaScene extends Phaser.Scene {
       });
     });
 
-    // Wasp (1 row of 8 frames: 0-7)
+    // Centipede
+    this.anims.create({
+      key: 'Centipede-idle',
+      frames: this.anims.generateFrameNumbers('Centipede', { start: 0, end: 7 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'Centipede-walk',
+      frames: this.anims.generateFrameNumbers('Centipede', { start: 8, end: 15 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'Centipede-fire',
+      frames: this.anims.generateFrameNumbers('Centipede', { start: 16, end: 23 }),
+      frameRate: 12,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'Centipede-hit',
+      frames: this.anims.generateFrameNumbers('Centipede', { start: 24, end: 31 }),
+      frameRate: 10,
+      repeat: 0
+    });
+
+    // Wasp
     this.anims.create({
       key: 'Wasp-idle',
       frames: this.anims.generateFrameNumbers('Wasp', { start: 0, end: 3 }),
       frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'Wasp-walk',
+      frames: this.anims.generateFrameNumbers('Wasp', { start: 0, end: 3 }),
+      frameRate: 9,
       repeat: -1
     });
     this.anims.create({
@@ -750,11 +821,17 @@ class TacticalArenaScene extends Phaser.Scene {
       repeat: 0
     });
 
-    // Hornet (2 rows of 8 frames: 0-15)
+    // Hornet
     this.anims.create({
       key: 'Hornet-idle',
       frames: this.anims.generateFrameNumbers('Hornet', { start: 0, end: 7 }),
       frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'Hornet-walk',
+      frames: this.anims.generateFrameNumbers('Hornet', { start: 0, end: 7 }),
+      frameRate: 12,
       repeat: -1
     });
     this.anims.create({
@@ -770,7 +847,7 @@ class TacticalArenaScene extends Phaser.Scene {
       repeat: 0
     });
 
-    // Combat Effects Animations (From Video)
+    // Combat Effects Animations
     this.anims.create({
       key: 'anim-muzzle',
       frames: this.anims.generateFrameNumbers('muzzle', { start: 0, end: 3 }),
@@ -820,7 +897,7 @@ class TacticalArenaScene extends Phaser.Scene {
       repeat: 0
     });
 
-    // Objective Capture Point Animations (Flag & Concentric Pulse)
+    // Objective Capture Point Animations
     this.anims.create({
       key: 'anim-flag',
       frames: this.anims.generateFrameNumbers('objective_flag', { start: 0, end: 5 }),
@@ -839,14 +916,12 @@ class TacticalArenaScene extends Phaser.Scene {
     const w = this.scale.width;
     const h = this.scale.height;
 
-    // Exact 1024:682 native aspect ratio calculation (No stretching, no distortion)
     const MAP_W = 1024;
     const MAP_H = 682;
     const mapAspect = MAP_W / MAP_H;
     const screenAspect = w / h;
 
     let bgW, bgH;
-    // Contain mode: entire map is 100% visible from left base to right base
     if (screenAspect > mapAspect) {
       bgH = h;
       bgW = Math.round(h * mapAspect);
@@ -865,9 +940,9 @@ class TacticalArenaScene extends Phaser.Scene {
     this.mapBg.setDisplaySize(bgW, bgH);
     this.mapBg.setDepth(-10);
 
-    // 2. Central Castle Objective Beacon (Entrance at ref 470, 405)
-    const objX = this.mapX(470);
-    const objY = this.mapY(405);
+    // 2. Central Castle Objective Beacon (Courtyard at ref 465, 495)
+    const objX = this.mapX(465);
+    const objY = this.mapY(495);
     const beaconScale = Math.max(0.9, 1.2 * (bgH / 682));
 
     this.objectivePulse = this.add.sprite(objX, objY, 'objective_pulse');
@@ -876,12 +951,12 @@ class TacticalArenaScene extends Phaser.Scene {
     this.objectivePulse.setTint(0xffd600); // Yellow neutral pulse
     this.objectivePulse.setDepth(1);
 
-    this.objectiveFlag = this.add.sprite(objX, this.mapY(360), 'objective_flag');
+    this.objectiveFlag = this.add.sprite(objX, this.mapY(440), 'objective_flag');
     this.objectiveFlag.setScale(beaconScale * 0.85);
     this.objectiveFlag.play('anim-flag');
     this.objectiveFlag.setDepth(2);
 
-    this.objectiveText = this.add.text(objX, this.mapY(305), 'LÂU ĐÀI TRUNG TÂM', {
+    this.objectiveText = this.add.text(objX, this.mapY(385), 'LÂU ĐÀI TRUNG TÂM', {
       fontFamily: 'Plus Jakarta Sans',
       fontSize: `${Math.round(Math.max(10, 12 * (bgW / 1024)))}px`,
       fontStyle: 'bold',
@@ -895,89 +970,139 @@ class TacticalArenaScene extends Phaser.Scene {
     this.applyCombatCamera(false);
   }
 
+  updateUnitScreenPos(u, offsetBob = 0) {
+    if (!u || !u.sprite || !u.label) return;
+    const pts = u.lane === 0 ? LANE_1_POINTS : LANE_2_POINTS;
+    const refPt = getSplinePos(pts, u.t);
+    const posX = this.mapX(refPt.x);
+    const posY = this.mapY(refPt.y) + offsetBob;
+    const uScale = this.getUnitScale();
+
+    u.sprite.setPosition(posX, posY);
+    u.sprite.setScale(uScale);
+    const labelOffset = 22 * (uScale / 1.8);
+    u.label.setPosition(posX, posY - labelOffset);
+  }
+
+  update(time, delta) {
+    if (!this.isReady) return;
+    Object.values(this.unitSprites).forEach(u => {
+      if (!u.isMoving) {
+        // Subtle breathing motion while waiting
+        const bob = Math.sin((time + u.seed) * 0.0035) * 1.5;
+        this.updateUnitScreenPos(u, bob);
+      }
+    });
+  }
+
   syncUnits(roster) {
     const activePlayerIds = new Set();
     const unitScale = this.getUnitScale();
 
-    // Human Team (Up to 10 players on Kingdom Map)
+    // Human Team (Up to 10 players)
     const humanPlayers = (roster.human || []).slice(0, 10);
-    const humanRefPositions = [
-      // Tuyến 1: 5 units along Western Main Road towards Castle
-      { x: 100, y: 390 }, { x: 160, y: 390 }, { x: 220, y: 390 }, { x: 280, y: 390 }, { x: 340, y: 400 },
-      // Tuyến 2: 5 units along Southwest Bastion Road
-      { x: 75, y: 535 }, { x: 135, y: 535 }, { x: 195, y: 535 }, { x: 255, y: 480 }, { x: 315, y: 440 }
-    ];
-
     humanPlayers.forEach((p, idx) => {
       activePlayerIds.add(p.id);
-      const ref = humanRefPositions[idx];
-      const posX = this.mapX(ref.x);
-      const posY = this.mapY(ref.y);
-      const labelOffset = 20 * (unitScale / 1.8);
+      const lane = idx % 2; // 0 = upper road, 1 = lower road
+      const laneSlot = Math.floor(idx / 2); // 0, 1, 2, 3, 4
+      const defaultT = 0.08 + laneSlot * 0.045; // Staggered near West base
 
-      if (this.unitSprites[p.id]) {
-        this.unitSprites[p.id].sprite.setPosition(posX, posY);
-        this.unitSprites[p.id].sprite.setScale(unitScale);
-        this.unitSprites[p.id].label.setPosition(posX, posY - labelOffset);
-        this.unitSprites[p.id].refX = ref.x;
-        this.unitSprites[p.id].refY = ref.y;
-      } else {
+      let u = this.unitSprites[p.id];
+      if (!u) {
+        const pts = lane === 0 ? LANE_1_POINTS : LANE_2_POINTS;
+        const refPt = getSplinePos(pts, defaultT);
+        const posX = this.mapX(refPt.x);
+        const posY = this.mapY(refPt.y);
+
         const sprite = this.add.sprite(posX, posY, p.unitClass);
         sprite.setScale(unitScale);
         sprite.play(`${p.unitClass}-idle`, true);
+        sprite.setFlipX(false);
+        sprite.setDepth(5);
 
+        const labelOffset = 22 * (unitScale / 1.8);
         const label = this.add.text(posX, posY - labelOffset, p.name, {
           fontFamily: 'Plus Jakarta Sans',
           fontSize: '10px',
           fontStyle: 'bold',
           color: '#0369A1',
           backgroundColor: '#E0F2FE',
-          padding: { x: 4, y: 1 }
+          padding: { x: 5, y: 1.5 }
         }).setOrigin(0.5);
+        label.setDepth(6);
 
-        this.unitSprites[p.id] = { sprite, label, team: 'human', unitClass: p.unitClass, refX: ref.x, refY: ref.y };
+        u = {
+          id: p.id,
+          name: p.name,
+          sprite,
+          label,
+          team: 'human',
+          unitClass: p.unitClass,
+          lane,
+          t: defaultT,
+          targetT: defaultT,
+          isMoving: false,
+          seed: Math.random() * 1000
+        };
+        this.unitSprites[p.id] = u;
+      } else {
+        u.name = p.name;
+        u.label.setText(p.name);
       }
+      this.updateUnitScreenPos(u);
     });
 
-    // Robot Team (Up to 10 players on Kingdom Map)
+    // Robot Team (Up to 10 players)
     const robotPlayers = (roster.robot || []).slice(0, 10);
-    const robotRefPositions = [
-      // Tuyến 1: 5 units along Northeast Road towards Castle
-      { x: 880, y: 200 }, { x: 800, y: 210 }, { x: 730, y: 240 }, { x: 660, y: 310 }, { x: 590, y: 360 },
-      // Tuyến 2: 5 units along Southeast Road Loop
-      { x: 920, y: 430 }, { x: 840, y: 430 }, { x: 760, y: 420 }, { x: 690, y: 440 }, { x: 570, y: 460 }
-    ];
-
     robotPlayers.forEach((p, idx) => {
       activePlayerIds.add(p.id);
-      const ref = robotRefPositions[idx];
-      const posX = this.mapX(ref.x);
-      const posY = this.mapY(ref.y);
-      const labelOffset = 20 * (unitScale / 1.8);
+      const lane = idx % 2;
+      const laneSlot = Math.floor(idx / 2);
+      const defaultT = 0.92 - laneSlot * 0.045; // Staggered near East base
 
-      if (this.unitSprites[p.id]) {
-        this.unitSprites[p.id].sprite.setPosition(posX, posY);
-        this.unitSprites[p.id].sprite.setScale(unitScale);
-        this.unitSprites[p.id].label.setPosition(posX, posY - labelOffset);
-        this.unitSprites[p.id].refX = ref.x;
-        this.unitSprites[p.id].refY = ref.y;
-      } else {
+      let u = this.unitSprites[p.id];
+      if (!u) {
+        const pts = lane === 0 ? LANE_1_POINTS : LANE_2_POINTS;
+        const refPt = getSplinePos(pts, defaultT);
+        const posX = this.mapX(refPt.x);
+        const posY = this.mapY(refPt.y);
+
         const sprite = this.add.sprite(posX, posY, p.unitClass);
         sprite.setScale(unitScale);
-        sprite.setFlipX(true);
         sprite.play(`${p.unitClass}-idle`, true);
+        sprite.setFlipX(true);
+        sprite.setDepth(5);
 
+        const labelOffset = 22 * (unitScale / 1.8);
         const label = this.add.text(posX, posY - labelOffset, p.name, {
           fontFamily: 'Plus Jakarta Sans',
           fontSize: '10px',
           fontStyle: 'bold',
           color: '#BE123C',
           backgroundColor: '#FFE4E6',
-          padding: { x: 4, y: 1 }
+          padding: { x: 5, y: 1.5 }
         }).setOrigin(0.5);
+        label.setDepth(6);
 
-        this.unitSprites[p.id] = { sprite, label, team: 'robot', unitClass: p.unitClass, refX: ref.x, refY: ref.y };
+        u = {
+          id: p.id,
+          name: p.name,
+          sprite,
+          label,
+          team: 'robot',
+          unitClass: p.unitClass,
+          lane,
+          t: defaultT,
+          targetT: defaultT,
+          isMoving: false,
+          seed: Math.random() * 1000
+        };
+        this.unitSprites[p.id] = u;
+      } else {
+        u.name = p.name;
+        u.label.setText(p.name);
       }
+      this.updateUnitScreenPos(u);
     });
 
     Object.keys(this.unitSprites).forEach(id => {
@@ -992,163 +1117,104 @@ class TacticalArenaScene extends Phaser.Scene {
   onNewQuestion() {
     this.applyCombatCamera(false);
     Object.values(this.unitSprites).forEach(u => {
+      u.isMoving = false;
       u.sprite.play(`${u.unitClass}-idle`, true);
+      u.sprite.setFlipX(u.team === 'robot');
     });
   }
 
-  // Play Full Combat & Objective Capture Sequence
+  // Play Full Combat & Tug of War Movement Sequence
   playCombatSequence(actions, objectiveState, objectiveEvent) {
     const uScale = this.getUnitScale();
 
+    // 1. TUG OF WAR ADVANCE & RETREAT MARCH
     actions.forEach((act, idx) => {
-      if (!act.isCorrect) return;
+      const u = this.unitSprites[act.playerId];
+      if (!u) return;
 
-      this.time.delayedCall(idx * 150, () => {
-        const attackerUnit = this.unitSprites[act.playerId];
-        const isHuman = act.team === 'human';
+      const isHuman = act.team === 'human';
 
-        let startX = isHuman ? this.mapX(200) : this.mapX(750);
-        let startY = isHuman ? this.mapY(430) : this.mapY(330);
+      if (act.isCorrect) {
+        // Calculate advance step
+        let deltaT = 0.075;
+        if (act.streak >= 2) deltaT += 0.025; // Streak charge bonus
+        if (act.isCritical) deltaT += 0.02;
 
-        if (attackerUnit) {
-          startX = attackerUnit.sprite.x;
-          startY = attackerUnit.sprite.y;
+        const startT = u.t;
+        const targetT = isHuman ? Math.min(0.92, startT + deltaT) : Math.max(0.08, startT - deltaT);
 
-          attackerUnit.sprite.play(`${attackerUnit.unitClass}-fire`, true);
-          attackerUnit.sprite.once('animationcomplete', () => {
-            attackerUnit.sprite.play(`${attackerUnit.unitClass}-idle`, true);
+        u.isMoving = true;
+        u.sprite.play(`${u.unitClass}-walk`, true);
+        u.sprite.setFlipX(!isHuman); // Human faces right, Robot faces left
+
+        // Speed / Charge aura if high streak
+        if (act.streak >= 2) {
+          const aura = this.add.sprite(u.sprite.x, u.sprite.y, 'laser');
+          aura.setScale(uScale * 1.3).play('anim-laser');
+          this.tweens.add({
+            targets: aura,
+            alpha: 0,
+            duration: 600,
+            onComplete: () => aura.destroy()
           });
         }
 
-        let targetX, targetY;
-        if (isHuman) {
-          // Shoot towards Robot eastern line / outpost
-          targetX = (startY < this.mapY(420) ? this.mapX(680) : this.mapX(730)) + (Math.random() * 60 - 30);
-          targetY = (startY < this.mapY(420) ? this.mapY(280) : this.mapY(420)) + (Math.random() * 40 - 20);
-        } else {
-          // Shoot towards Human western line / bastion
-          targetX = (startY < this.mapY(350) ? this.mapX(240) : this.mapX(180)) + (Math.random() * 60 - 30);
-          targetY = (startY < this.mapY(350) ? this.mapY(390) : this.mapY(490)) + (Math.random() * 40 - 20);
-        }
-
-        // 1. TACTICAL ARROW / VECTOR TRAJECTORY (From Video)
-        const arrowLine = this.add.graphics();
-        arrowLine.lineStyle(2, isHuman ? 0x0284c7 : 0xe11d48, 0.7);
-        arrowLine.lineBetween(startX, startY, targetX, targetY);
-        this.time.delayedCall(300, () => arrowLine.destroy());
-
-        // 2. RED DANGER / THREAT GRID (From Video)
-        const threatGrid = this.add.rectangle(targetX, targetY, 36, 36, 0xff0033, 0.35);
-        threatGrid.setStrokeStyle(1.5, 0xff0033, 0.8);
-        this.time.delayedCall(400, () => threatGrid.destroy());
-
-        // 3. TARGET LOCKING CURSOR BRACKETS [ ] (From Video)
-        const targetCursor = this.add.sprite(targetX, targetY, 'target_cursor');
-        targetCursor.setScale(uScale);
-        targetCursor.setTint(isHuman ? 0x0284c7 : 0xe11d48);
+        // March Tween along lane spline
         this.tweens.add({
-          targets: targetCursor,
-          scale: uScale * 1.3,
-          alpha: 0,
-          duration: 350,
-          onComplete: () => targetCursor.destroy()
-        });
-
-        // 4. MUZZLE FLASH & AUDIO
-        const muzzleOffset = isHuman ? (10 * uScale) : (-10 * uScale);
-        const muzzle = this.add.sprite(startX + muzzleOffset, startY, isHuman ? 'muzzle' : 'laser');
-        muzzle.setScale(uScale);
-        muzzle.play(isHuman ? 'anim-muzzle' : 'anim-laser', true);
-        muzzle.once('animationcomplete', () => muzzle.destroy());
-
-        const isRPG = act.streak >= 3;
-        if (window.soundFX) {
-          if (isRPG) {
-            window.soundFX.playRpgLaunch();
-          } else {
-            window.soundFX.playShot(!isHuman);
-          }
-        }
-
-        // 5. PROJECTILE
-        const projectileKey = isRPG ? 'rpg' : 'bullets';
-        const proj = this.add.sprite(startX, startY, projectileKey);
-        proj.setScale(uScale);
-        if (!isHuman) proj.setFlipX(true);
-
-        const duration = isRPG ? 450 : 280;
-
-        this.tweens.add({
-          targets: proj,
-          x: targetX,
-          y: targetY,
-          duration: duration,
+          targets: u,
+          t: targetT,
+          duration: 1300,
           ease: 'Power1',
+          onUpdate: () => {
+            this.updateUnitScreenPos(u);
+          },
           onComplete: () => {
-            proj.destroy();
+            u.isMoving = false;
+            u.t = targetT;
+            this.updateUnitScreenPos(u);
 
-            // Audio on Hit Impact
-            if (window.soundFX) {
-              window.soundFX.playHit();
-              window.soundFX.playExplosion(isRPG);
-            }
-
-            // Real-time Battle Feed Notification
-            addBattleTicker(
-              `${isHuman ? '🛡️' : '🤖'} ${act.playerName || (isHuman ? 'Chiến Binh' : 'Robot')} nã đạn trúng! (-${act.damage} HP)`,
-              isHuman ? 'human' : 'robot'
-            );
-
-            // 6. MULTI-LAYER IMPACT VFX (Sparks, Spatters, Fragments, Smoke)
-            const sparks = this.add.sprite(targetX, targetY, 'sparks');
-            sparks.setScale(uScale * 0.9).play('anim-sparks').once('animationcomplete', () => sparks.destroy());
-
-            const spatters = this.add.sprite(targetX + 4, targetY, 'spatters');
-            spatters.setScale(uScale * 0.9).play('anim-spatters').once('animationcomplete', () => spatters.destroy());
-
-            const frags = this.add.sprite(targetX, targetY, 'fragments');
-            frags.setScale(uScale * 0.6).play('anim-fragments').once('animationcomplete', () => frags.destroy());
-
-            const smoke = this.add.sprite(targetX, targetY - 8, 'smoke');
-            smoke.setScale(uScale * 0.9).play('anim-smoke').once('animationcomplete', () => smoke.destroy());
-
-            if (isRPG) {
-              const bigExp = this.add.sprite(targetX, targetY, 'big_exp');
-              bigExp.setScale(uScale * 1.3).play('anim-big-exp').once('animationcomplete', () => bigExp.destroy());
-              this.cameras.main.shake(120, 0.007);
-            } else {
-              const smallExp = this.add.sprite(targetX, targetY, 'small_exp');
-              smallExp.setScale(uScale * 1.1).play('anim-small-exp').once('animationcomplete', () => smallExp.destroy());
-            }
-
-            // Floating Damage Number
-            const dmgText = this.add.text(targetX, targetY - 18, `-${act.damage}`, {
-              fontFamily: 'Chakra Petch',
-              fontSize: isRPG ? '20px' : '15px',
-              fontStyle: 'bold',
-              color: isHuman ? '#38bdf8' : '#fb7185'
-            }).setOrigin(0.5);
-
-            this.tweens.add({
-              targets: dmgText,
-              y: targetY - 45,
-              alpha: 0,
-              duration: 700,
-              onComplete: () => dmgText.destroy()
-            });
+            // Execute combat weapon attack once march completes
+            this.executeUnitAttack(u, act);
           }
         });
-      });
+
+      } else {
+        // Incorrect answer: Unit is hit & staggers backward
+        u.sprite.play(`${u.unitClass}-hit`, true);
+        const sparks = this.add.sprite(u.sprite.x, u.sprite.y, 'sparks');
+        sparks.setScale(uScale).play('anim-sparks').once('animationcomplete', () => sparks.destroy());
+
+        const knockbackT = isHuman ? Math.max(0.04, u.t - 0.035) : Math.min(0.96, u.t + 0.035);
+        this.tweens.add({
+          targets: u,
+          t: knockbackT,
+          duration: 450,
+          ease: 'Quad.easeOut',
+          onUpdate: () => {
+            this.updateUnitScreenPos(u);
+          },
+          onComplete: () => {
+            u.t = knockbackT;
+            this.updateUnitScreenPos(u);
+            u.sprite.play(`${u.unitClass}-idle`, true);
+            u.sprite.setFlipX(isHuman ? false : true);
+          }
+        });
+      }
     });
 
-    // 7. HANDLE OBJECTIVE CAPTURE EVENT (CHIẾM CỨ ĐIỂM LÂU ĐÀI)
-    if (objectiveEvent && objectiveEvent.type === 'captured') {
-      this.time.delayedCall(actions.length * 150 + 500, () => {
-        const isHumanWinner = objectiveEvent.winner === 'human';
-        const beaconX = this.mapX(470);
-        const beaconY = this.mapY(360);
+    // 2. CHECK BASE SIEGE BREACHES (Lính áp sát căn cứ địch)
+    this.time.delayedCall(1600, () => {
+      this.checkBaseBreaches();
+    });
 
-        // Sound on Castle Capture
+    // 3. HANDLE OBJECTIVE CAPTURE EVENT (CHIẾM CỨ ĐIỂM LÂU ĐÀI)
+    if (objectiveEvent && objectiveEvent.type === 'captured') {
+      this.time.delayedCall(actions.length * 100 + 1700, () => {
+        const isHumanWinner = objectiveEvent.winner === 'human';
+        const beaconX = this.mapX(465);
+        const beaconY = this.mapY(440);
+
         if (window.soundFX) {
           window.soundFX.playCapture();
           window.soundFX.playExplosion(true);
@@ -1156,21 +1222,19 @@ class TacticalArenaScene extends Phaser.Scene {
 
         addBattleTicker(`🏰 ${objectiveEvent.title}! Pháo quỹ đạo khai hỏa!`, 'castle');
 
-        // Update Flag & Pulse Color
         this.objectivePulse.setTint(isHumanWinner ? 0x0284c7 : 0xe11d48);
         this.objectiveFlag.setTint(isHumanWinner ? 0x0284c7 : 0xe11d48);
 
         this.objectiveText.setText(isHumanWinner ? 'LÂU ĐÀI: PHE NGƯỜI KIỂM SOÁT' : 'LÂU ĐÀI: ROBOT KIỂM SOÁT');
         this.objectiveText.setColor(isHumanWinner ? '#38bdf8' : '#fb7185');
 
-        // Big Celebratory Explosion at Castle
         const beaconExp = this.add.sprite(beaconX, beaconY, 'big_exp');
         beaconExp.setScale(uScale * 1.8).play('anim-big-exp').once('animationcomplete', () => beaconExp.destroy());
         this.cameras.main.shake(200, 0.012);
 
         // Orbital Artillery Strike from Castle to Enemy Base!
-        const enemyBaseX = isHumanWinner ? this.mapX(900) : this.mapX(95);
-        const enemyBaseY = isHumanWinner ? this.mapY(175) : this.mapY(590);
+        const enemyBaseX = isHumanWinner ? this.mapX(940) : this.mapX(60);
+        const enemyBaseY = isHumanWinner ? this.mapY(260) : this.mapY(530);
 
         const beam = this.add.graphics();
         beam.lineStyle(6, isHumanWinner ? 0x0284c7 : 0xe11d48, 0.95);
@@ -1179,29 +1243,183 @@ class TacticalArenaScene extends Phaser.Scene {
 
         const baseImpact = this.add.sprite(enemyBaseX, enemyBaseY, 'big_exp');
         baseImpact.setScale(uScale * 2.0).play('anim-big-exp').once('animationcomplete', () => baseImpact.destroy());
+      });
+    }
+  }
 
-        // Banner Announcement Overlay
-        const bannerText = this.add.text(this.scale.width / 2, 50, objectiveEvent.title, {
+  executeUnitAttack(u, act) {
+    const uScale = this.getUnitScale();
+    const isHuman = u.team === 'human';
+
+    u.sprite.play(`${u.unitClass}-fire`, true);
+    u.sprite.once('animationcomplete', () => {
+      u.sprite.play(`${u.unitClass}-idle`, true);
+      u.sprite.setFlipX(isHuman ? false : true);
+    });
+
+    const startX = u.sprite.x;
+    const startY = u.sprite.y;
+
+    // Find nearest opposing soldier on the same lane
+    let targetX, targetY;
+    let targetUnit = null;
+    let minDist = 99999;
+
+    Object.values(this.unitSprites).forEach(other => {
+      if (other.team !== u.team && other.lane === u.lane) {
+        const d = Phaser.Math.Distance.Between(startX, startY, other.sprite.x, other.sprite.y);
+        if (d < minDist) {
+          minDist = d;
+          targetUnit = other;
+        }
+      }
+    });
+
+    if (targetUnit && minDist < 450) {
+      targetX = targetUnit.sprite.x + (Math.random() * 20 - 10);
+      targetY = targetUnit.sprite.y + (Math.random() * 20 - 10);
+    } else {
+      // Aim toward Castle or forward along lane
+      const forwardT = isHuman ? Math.min(1.0, u.t + 0.22) : Math.max(0.0, u.t - 0.22);
+      const pts = u.lane === 0 ? LANE_1_POINTS : LANE_2_POINTS;
+      const forwardRef = getSplinePos(pts, forwardT);
+      targetX = this.mapX(forwardRef.x);
+      targetY = this.mapY(forwardRef.y);
+    }
+
+    // Muzzle flash
+    const muzzleOffset = isHuman ? (10 * uScale) : (-10 * uScale);
+    const muzzle = this.add.sprite(startX + muzzleOffset, startY, isHuman ? 'muzzle' : 'laser');
+    muzzle.setScale(uScale).play(isHuman ? 'anim-muzzle' : 'anim-laser', true);
+    muzzle.once('animationcomplete', () => muzzle.destroy());
+
+    const isRPG = act.streak >= 3;
+    if (window.soundFX) {
+      if (isRPG) window.soundFX.playRpgLaunch();
+      else window.soundFX.playShot(!isHuman);
+    }
+
+    // Trajectory beam
+    const arrowLine = this.add.graphics();
+    arrowLine.lineStyle(2, isHuman ? 0x0284c7 : 0xe11d48, 0.7);
+    arrowLine.lineBetween(startX, startY, targetX, targetY);
+    this.time.delayedCall(250, () => arrowLine.destroy());
+
+    // Projectile
+    const projectileKey = isRPG ? 'rpg' : 'bullets';
+    const proj = this.add.sprite(startX, startY, projectileKey);
+    proj.setScale(uScale);
+    if (!isHuman) proj.setFlipX(true);
+
+    const duration = isRPG ? 380 : 250;
+
+    this.tweens.add({
+      targets: proj,
+      x: targetX,
+      y: targetY,
+      duration: duration,
+      ease: 'Power1',
+      onComplete: () => {
+        proj.destroy();
+
+        if (window.soundFX) {
+          window.soundFX.playHit();
+          window.soundFX.playExplosion(isRPG);
+        }
+
+        if (targetUnit && targetUnit.sprite) {
+          targetUnit.sprite.play(`${targetUnit.unitClass}-hit`, true);
+          targetUnit.sprite.once('animationcomplete', () => {
+            targetUnit.sprite.play(`${targetUnit.unitClass}-idle`, true);
+            targetUnit.sprite.setFlipX(targetUnit.team === 'robot');
+          });
+        }
+
+        addBattleTicker(
+          `${isHuman ? '🛡️' : '🤖'} ${act.playerName || (isHuman ? 'Chiến Binh' : 'Robot')} tiến công nổ súng! (-${act.damage} HP)`,
+          isHuman ? 'human' : 'robot'
+        );
+
+        // Multi-layer impact VFX
+        const sparks = this.add.sprite(targetX, targetY, 'sparks');
+        sparks.setScale(uScale * 0.9).play('anim-sparks').once('animationcomplete', () => sparks.destroy());
+
+        const spatters = this.add.sprite(targetX + 4, targetY, 'spatters');
+        spatters.setScale(uScale * 0.9).play('anim-spatters').once('animationcomplete', () => spatters.destroy());
+
+        const smoke = this.add.sprite(targetX, targetY - 8, 'smoke');
+        smoke.setScale(uScale * 0.9).play('anim-smoke').once('animationcomplete', () => smoke.destroy());
+
+        if (isRPG) {
+          const bigExp = this.add.sprite(targetX, targetY, 'big_exp');
+          bigExp.setScale(uScale * 1.3).play('anim-big-exp').once('animationcomplete', () => bigExp.destroy());
+          this.cameras.main.shake(120, 0.007);
+        } else {
+          const smallExp = this.add.sprite(targetX, targetY, 'small_exp');
+          smallExp.setScale(uScale * 1.1).play('anim-small-exp').once('animationcomplete', () => smallExp.destroy());
+        }
+
+        // Floating Damage Number
+        const dmgText = this.add.text(targetX, targetY - 18, `-${act.damage}`, {
           fontFamily: 'Chakra Petch',
-          fontSize: '18px',
+          fontSize: isRPG ? '20px' : '15px',
           fontStyle: 'bold',
-          color: isHumanWinner ? '#38bdf8' : '#fb7185',
-          backgroundColor: '#0c1222',
-          padding: { x: 16, y: 8 }
+          color: isHuman ? '#38bdf8' : '#fb7185'
         }).setOrigin(0.5);
 
         this.tweens.add({
-          targets: bannerText,
-          scale: 1.15,
-          yoyo: true,
-          duration: 400,
-          repeat: 2,
-          onComplete: () => {
-            this.tweens.add({ targets: bannerText, alpha: 0, duration: 500, onComplete: () => bannerText.destroy() });
-          }
+          targets: dmgText,
+          y: targetY - 45,
+          alpha: 0,
+          duration: 700,
+          onComplete: () => dmgText.destroy()
         });
-      });
-    }
+      }
+    });
+  }
+
+  checkBaseBreaches() {
+    const uScale = this.getUnitScale();
+    Object.values(this.unitSprites).forEach(u => {
+      if (u.team === 'human' && u.t >= 0.82) {
+        // Human sieging robot base
+        const enemyBaseX = this.mapX(940);
+        const enemyBaseY = this.mapY(260);
+        const exp = this.add.sprite(enemyBaseX, enemyBaseY, 'big_exp');
+        exp.setScale(uScale * 1.6).play('anim-big-exp').once('animationcomplete', () => exp.destroy());
+        this.cameras.main.shake(160, 0.01);
+        addBattleTicker(`🔥 CHIẾN BINH ${u.name} ĐÃ ÁP SÁT VÀ NÃ PHÁO VÀO CĂN CỨ ROBOT!`, 'human');
+      } else if (u.team === 'robot' && u.t <= 0.18) {
+        // Robot sieging human base
+        const enemyBaseX = this.mapX(60);
+        const enemyBaseY = this.mapY(530);
+        const exp = this.add.sprite(enemyBaseX, enemyBaseY, 'big_exp');
+        exp.setScale(uScale * 1.6).play('anim-big-exp').once('animationcomplete', () => exp.destroy());
+        this.cameras.main.shake(160, 0.01);
+        addBattleTicker(`⚠️ ROBOT ${u.name} ĐÃ ĐỘT KÍCH VÀ BẮN PHÁ CĂN CỨ LOÀI NGƯỜI!`, 'robot');
+      }
+    });
+  }
+
+  celebrateVictory(winnerTeam) {
+    const uScale = this.getUnitScale();
+    Object.values(this.unitSprites).forEach(u => {
+      u.isMoving = false;
+      if (u.team === winnerTeam) {
+        this.tweens.add({
+          targets: u.sprite,
+          y: u.sprite.y - (18 * (uScale / 1.8)),
+          yoyo: true,
+          repeat: 4,
+          duration: 300,
+          ease: 'Quad.easeInOut'
+        });
+        const sparks = this.add.sprite(u.sprite.x, u.sprite.y - 20, 'sparks');
+        sparks.setScale(uScale * 1.2).play('anim-sparks').once('animationcomplete', () => sparks.destroy());
+      } else if (winnerTeam !== 'draw') {
+        u.sprite.play(`${u.unitClass}-hit`, true);
+      }
+    });
   }
 }
 
