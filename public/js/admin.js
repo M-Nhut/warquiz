@@ -20,11 +20,14 @@ const btnExportAll = document.getElementById('btn-export-all');
 const fileImport = document.getElementById('file-import');
 
 // Fetch Quizzes List
-async function fetchQuizzes() {
+async function fetchQuizzes(autoSelectFirst = true) {
   try {
     const res = await fetch('/api/quizzes');
     currentQuizzes = await res.json();
     renderQuizList();
+    if (autoSelectFirst && currentQuizzes.length > 0 && !activeQuiz) {
+      selectQuiz(currentQuizzes[0].id);
+    }
   } catch (err) {
     console.error('Lỗi tải câu hỏi:', err);
   }
@@ -339,6 +342,184 @@ fileImport.onchange = (e) => {
   };
   reader.readAsText(file);
 };
+
+// --- LaTeX Import Modal & Parser ---
+const modalLatexImport = document.getElementById('modal-latex-import');
+const btnImportLatexModal = document.getElementById('btn-import-latex-modal');
+const btnCloseLatexModal = document.getElementById('btn-close-latex-modal');
+const btnCancelLatexModal = document.getElementById('btn-cancel-latex-modal');
+const btnParseLatexSubmit = document.getElementById('btn-parse-latex-submit');
+const latexQuizTitle = document.getElementById('latex-quiz-title');
+const latexInputRaw = document.getElementById('latex-input-raw');
+const latexParseStatus = document.getElementById('latex-parse-status');
+
+if (btnImportLatexModal) {
+  btnImportLatexModal.onclick = () => {
+    if (window.soundFX) window.soundFX.playClick();
+    if (latexParseStatus) latexParseStatus.classList.add('hidden');
+    if (latexInputRaw) latexInputRaw.value = '';
+    if (modalLatexImport) modalLatexImport.classList.remove('hidden');
+  };
+}
+
+const hideLatexModal = () => {
+  if (modalLatexImport) modalLatexImport.classList.add('hidden');
+};
+
+if (btnCloseLatexModal) btnCloseLatexModal.onclick = hideLatexModal;
+if (btnCancelLatexModal) btnCancelLatexModal.onclick = hideLatexModal;
+
+function extractBalancedBraces(str, startIndex) {
+  let depth = 0;
+  let start = -1;
+  for (let i = startIndex; i < str.length; i++) {
+    if (str[i] === '{') {
+      if (depth === 0) start = i + 1;
+      depth++;
+    } else if (str[i] === '}') {
+      depth--;
+      if (depth === 0) {
+        return { content: str.slice(start, i), endIndex: i };
+      }
+    }
+  }
+  return null;
+}
+
+function cleanLatexMath(str) {
+  if (!str) return '';
+  return str
+    .replace(/\\>/g, '')
+    .replace(/\\\\/g, '')
+    .replace(/\\\[\d*pt\]/g, '')
+    .replace(/\\kill/g, '')
+    .replace(/\\hspace\{[^}]+\}/g, '')
+    .replace(/\\left\|/g, '|')
+    .replace(/\\right\|/g, '|')
+    .replace(/\\dfrac/g, '\\frac')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function parseLatexQuiz(latex) {
+  const questions = [];
+
+  // Extract all answer keys from tables
+  const answerKeys = [];
+  const tablePartMatches = latex.matchAll(/\\textbf\{Đáp án\}[\s\S]*?\\\\/g);
+  for (const tm of tablePartMatches) {
+    const row = tm[0];
+    const letters = row.matchAll(/\\textbf\{([A-D])\}/g);
+    for (const lm of letters) {
+      answerKeys.push(lm[1]);
+    }
+  }
+
+  // Find all \textbf that start with a digit or "Câu"
+  const markerRegex = /\\textbf\{(?=(?:Câu\s*)?\d+[:.]?)/g;
+  const questionStarts = [];
+  let m;
+  while ((m = markerRegex.exec(latex)) !== null) {
+    const extracted = extractBalancedBraces(latex, m.index + 7);
+    if (extracted) {
+      questionStarts.push({
+        rawTitle: extracted.content,
+        endIndex: extracted.endIndex,
+        startIndex: m.index
+      });
+    }
+  }
+
+  for (let i = 0; i < questionStarts.length; i++) {
+    const qInfo = questionStarts[i];
+    const nextStart = (i + 1 < questionStarts.length) ? questionStarts[i + 1].startIndex : latex.indexOf('\\begin{tabular}', qInfo.endIndex);
+    const bodySlice = latex.slice(qInfo.endIndex, nextStart !== -1 ? nextStart : undefined);
+
+    let qTitle = qInfo.rawTitle.replace(/^(?:Câu\s*)?\d+[:.]?\s*/, '').trim();
+
+    // Check if the body also has part of the question before A.
+    const firstOptIdx = bodySlice.search(/[A-D]\.\s*/);
+    if (firstOptIdx > 0) {
+      const extraText = bodySlice.slice(0, firstOptIdx)
+        .replace(/\\begin\{tabbing\}/g, '')
+        .replace(/\\hspace\{[^}]+\}/g, '')
+        .replace(/\\=/g, '')
+        .replace(/\\kill/g, '')
+        .trim();
+      if (extraText) {
+        qTitle += ' ' + extraText;
+      }
+    }
+
+    qTitle = cleanLatexMath(qTitle);
+
+    // Extract options A, B, C, D
+    const aMatch = bodySlice.match(/A\.\s*([\s\S]*?)(?=\\>|\s*B\.|$)/);
+    const bMatch = bodySlice.match(/B\.\s*([\s\S]*?)(?=\\>|\s*C\.|$)/);
+    const cMatch = bodySlice.match(/C\.\s*([\s\S]*?)(?=\\>|\s*D\.|$)/);
+    const dMatch = bodySlice.match(/D\.\s*([\s\S]*?)(?=\\\[|\\end\{tabbing\}|\\end\{document\}|$)/);
+
+    const optA = cleanLatexMath(aMatch ? aMatch[1] : '');
+    const optB = cleanLatexMath(bMatch ? bMatch[1] : '');
+    const optC = cleanLatexMath(cMatch ? cMatch[1] : '');
+    const optD = cleanLatexMath(dMatch ? dMatch[1] : '');
+
+    const correctLetter = answerKeys[i] || 'A';
+    const letterToIdx = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+
+    questions.push({
+      id: `latex-q-${Date.now()}-${i + 1}`,
+      question: qTitle,
+      options: [optA, optB, optC, optD],
+      correctIndex: letterToIdx[correctLetter] ?? 0,
+      difficulty: 1
+    });
+  }
+
+  return { questions, answerKeysCount: answerKeys.length };
+}
+
+if (btnParseLatexSubmit) {
+  btnParseLatexSubmit.onclick = async () => {
+    const rawLatex = latexInputRaw.value.trim();
+    if (!rawLatex) {
+      alert('Vui lòng dán mã LaTeX vào ô nhập!');
+      return;
+    }
+
+    try {
+      const { questions, answerKeysCount } = parseLatexQuiz(rawLatex);
+      if (questions.length === 0) {
+        latexParseStatus.className = 'p-3 rounded-xl border-2 border-[#18181B] bg-[#FFE4E6] text-[#BE123C] text-xs font-bold block';
+        latexParseStatus.textContent = '❌ Không nhận diện được câu hỏi nào từ mã LaTeX. Vui lòng kiểm tra định dạng \\textbf{Câu 1: ...} hoặc \\textbf{1. ...}';
+        return;
+      }
+
+      let title = latexQuizTitle.value.trim();
+      if (!title) {
+        const titleMatch = rawLatex.match(/\\textbf\{\\Large\s+([^}]+)\}/);
+        title = titleMatch ? titleMatch[1] : `Bộ Câu Hỏi LaTeX (${questions.length} câu)`;
+      }
+
+      activeQuiz = {
+        id: `quiz-latex-${Date.now()}`,
+        title: title,
+        description: `Tự động tạo từ mã LaTeX gồm ${questions.length} câu hỏi`,
+        timePerQuestion: 20,
+        questions: questions
+      };
+
+      hideLatexModal();
+      renderQuizEditor();
+      if (window.soundFX) window.soundFX.playCorrect();
+      alert(`🎉 Đã phân tích thành công ${questions.length} câu hỏi LaTeX (khớp ${answerKeysCount} đáp án)! Hãy nhấn "Lưu Thay Đổi" để lưu vào hệ thống.`);
+    } catch (err) {
+      console.error(err);
+      latexParseStatus.className = 'p-3 rounded-xl border-2 border-[#18181B] bg-[#FFE4E6] text-[#BE123C] text-xs font-bold block';
+      latexParseStatus.textContent = 'Lỗi phân tích mã LaTeX: ' + err.message;
+    }
+  };
+}
 
 // Initial Load
 fetchQuizzes();

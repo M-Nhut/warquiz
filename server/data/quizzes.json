@@ -1,5 +1,133 @@
 [
   {
+    "id": "quiz-vector-math",
+    "title": "Bài Tập Trắc Nghiệm Vectơ & Tích Vô Hướng (Toán 10)",
+    "description": "Bộ 10 câu trắc nghiệm chuyên đề vectơ, góc giữa hai vectơ và tích vô hướng chuẩn chương trình Toán THPT",
+    "timePerQuestion": 20,
+    "questions": [
+      {
+        "id": "vec-1",
+        "question": "Cho 2 vectơ $\\vec{a}$ và $\\vec{b}$ thỏa mãn $|\\vec{a}| = 3$, $|\\vec{b}| = 2$ và $\\vec{a}\\vec{b} = -3$. Xác định góc $\\alpha$ giữa hai vectơ $\\vec{a}$ và $\\vec{b}$:",
+        "options": [
+          "$\\alpha = 30^\\circ$",
+          "$\\alpha = 45^\\circ$",
+          "$\\alpha = 60^\\circ$",
+          "$\\alpha = 120^\\circ$"
+        ],
+        "correctIndex": 3,
+        "difficulty": 2
+      },
+      {
+        "id": "vec-2",
+        "question": "Cho hình bình hành $ABCD$. Góc giữa hai vectơ $\\vec{AB}$ và $\\vec{BC}$ là:",
+        "options": [
+          "$\\widehat{BAC}$",
+          "$\\widehat{ADC}$",
+          "$\\widehat{BAD}$",
+          "$\\widehat{ABC}$"
+        ],
+        "correctIndex": 2,
+        "difficulty": 2
+      },
+      {
+        "id": "vec-3",
+        "question": "Cho các vectơ $\\vec{a}$, $\\vec{b}$ thỏa mãn $|\\vec{a}| = 8$, $|\\vec{b}| = 10$, $(\\vec{a}, \\vec{b}) = 30^\\circ$. Giá trị của tích vô hướng $\\vec{a}\\vec{b}$ là:",
+        "options": [
+          "$40$",
+          "$-40$",
+          "$40\\sqrt{3}$",
+          "$-40\\sqrt{3}$"
+        ],
+        "correctIndex": 2,
+        "difficulty": 1
+      },
+      {
+        "id": "vec-4",
+        "question": "Cho tam giác vuông cân $ABC$ cạnh $AB = AC = a$. Tính $\\vec{AB} \\cdot \\vec{AC}$:",
+        "options": [
+          "$a^2$",
+          "$-\\frac{a^2}{2}$",
+          "$0$",
+          "$\\frac{a^2\\sqrt{3}}{2}$"
+        ],
+        "correctIndex": 2,
+        "difficulty": 1
+      },
+      {
+        "id": "vec-5",
+        "question": "Cho hình vuông $ABCD$ có cạnh $a$. Tìm khẳng định đúng nhất:",
+        "options": [
+          "$\\vec{AB} \\cdot \\vec{AD} = 0$; $\\vec{AB} \\cdot \\vec{AC} = 0$",
+          "$\\vec{AB} \\cdot \\vec{AD} = 0$; $\\vec{AB} \\cdot \\vec{AC} = a^2$",
+          "$\\vec{AB} \\cdot \\vec{AD} = a^2$; $\\vec{AB} \\cdot \\vec{AC} = 0$",
+          "$\\vec{AB} \\cdot \\vec{AD} = a^2$; $\\vec{AB} \\cdot \\vec{AC} = a^2$"
+        ],
+        "correctIndex": 1,
+        "difficulty": 2
+      },
+      {
+        "id": "vec-6",
+        "question": "Cho hai vectơ $\\vec{a}$ và $\\vec{b}$ đều khác vectơ $\\vec{0}$. Khẳng định nào sau đây đúng?",
+        "options": [
+          "$\\vec{a} \\cdot \\vec{b} = |\\vec{a}| \\cdot |\\vec{b}|$",
+          "$\\vec{a} \\cdot \\vec{b} = |\\vec{a}| \\cdot |\\vec{b}| \\cdot \\cos(\\vec{a}, \\vec{b})$",
+          "$\\vec{a} \\cdot \\vec{b} = |\\vec{a}\\vec{b}| \\cdot \\cos(\\vec{a}, \\vec{b})$",
+          "$\\vec{a} \\cdot \\vec{b} = |\\vec{a}| \\cdot |\\vec{b}| \\cdot \\sin(\\vec{a}, \\vec{b})$"
+        ],
+        "correctIndex": 1,
+        "difficulty": 1
+      },
+      {
+        "id": "vec-7",
+        "question": "Tam giác $ABC$ vuông ở $A$ và có góc $\\widehat{B} = 50^\\circ$. Hệ thức nào sau đây sai?",
+        "options": [
+          "$(\\vec{AB}, \\vec{BC}) = 130^\\circ$",
+          "$(\\vec{BC}, \\vec{AC}) = 40^\\circ$",
+          "$(\\vec{AB}, \\vec{CB}) = 50^\\circ$",
+          "$(\\vec{AC}, \\vec{CB}) = 40^\\circ$"
+        ],
+        "correctIndex": 3,
+        "difficulty": 2
+      },
+      {
+        "id": "vec-8",
+        "question": "Cho các vectơ $\\vec{a}, \\vec{b}$ khác $\\vec{0}$. Khẳng định nào sau đây là đúng?",
+        "options": [
+          "$\\vec{a} \\perp \\vec{b} \\Leftrightarrow \\vec{a} \\cdot \\vec{b} = 0$",
+          "$\\vec{a} \\perp \\vec{b} \\Leftrightarrow \\vec{a} \\cdot \\vec{b} = |\\vec{a}| \\cdot |\\vec{b}|$",
+          "$\\vec{a} \\perp \\vec{b} \\Leftrightarrow |\\vec{a}| = |\\vec{b}|$",
+          "$\\vec{a} \\perp \\vec{b} \\Leftrightarrow \\vec{a}^2 = \\vec{b}^2$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "vec-9",
+        "question": "Cho các vectơ $\\vec{a}, \\vec{b}$. Khẳng định nào sau đây là đúng?",
+        "options": [
+          "$(\\vec{a} - \\vec{b})(\\vec{a} + \\vec{b}) = \\vec{a}^2 - \\vec{b}^2$",
+          "$(\\vec{a} + \\vec{b})(\\vec{a} + \\vec{b}) = \\vec{a}^2 - \\vec{b}^2$",
+          "$\\vec{a} \\perp \\vec{b} \\Leftrightarrow |\\vec{a}| = |\\vec{b}|$",
+          "$\\vec{a} \\perp \\vec{b} \\Leftrightarrow \\vec{a}^2 = \\vec{b}^2$"
+        ],
+        "correctIndex": 0,
+        "difficulty": 1
+      },
+      {
+        "id": "vec-10",
+        "question": "Cho hình vuông $ABCD$. Góc giữa hai vectơ $\\vec{AB}$ và $\\vec{AC}$ là:",
+        "options": [
+          "$\\widehat{ABC}$",
+          "$\\widehat{ACB}$",
+          "$\\widehat{BAC}$",
+          "$\\widehat{DAB}$"
+        ],
+        "correctIndex": 2,
+        "difficulty": 1
+      }
+    ]
+  },
+  {
     "id": "quiz-robotwar",
     "title": "Chiến Tranh Robot & Công Nghệ Tương Lai",
     "description": "Thử thách kiến thức về AI, người máy, công nghệ viễn tưởng và kỹ thuật số.",
